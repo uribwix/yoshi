@@ -10,7 +10,7 @@ const createTask = options => {
   const defaults = {
     log: x => x,
     watch: false,
-    inTeamCity: () => false,
+    inTeamCity: false,
     projectConfig: {jestConfig: () => ({})},
   };
 
@@ -110,7 +110,7 @@ describe('Jest', () => {
       });
 
       const task = createTask({
-        inTeamCity: () => true
+        inTeamCity: true
       });
 
       return task()

@@ -19,7 +19,7 @@ describe('Update node version', () => {
       '.nvmrc': '0'
     });
 
-    return updateNodeVersion({inTeamCity: () => false})()
+    return updateNodeVersion({inTeamCity: false})()
       .then(() => {
         expect(test.content('.nvmrc')).to.equal(nodeVersion);
       });
@@ -30,7 +30,7 @@ describe('Update node version', () => {
 
     test.setup({});
 
-    return updateNodeVersion({inTeamCity: () => false})()
+    return updateNodeVersion({inTeamCity: false})()
       .then(() => {
         expect(test.content('.nvmrc')).to.equal(nodeVersion);
       });
@@ -41,7 +41,7 @@ describe('Update node version', () => {
       '.nvmrc': '99.0.0'
     });
 
-    return updateNodeVersion({inTeamCity: () => false})()
+    return updateNodeVersion({inTeamCity: false})()
       .then(() => {
         expect(test.content('.nvmrc')).to.equal('99.0.0');
       });
@@ -50,7 +50,7 @@ describe('Update node version', () => {
   it('should not update .nvmrc inside TeamCity', () => {
     test.setup({});
 
-    return updateNodeVersion({inTeamCity: () => true})()
+    return updateNodeVersion({inTeamCity: true})()
       .then(() => {
         expect(test.list('.nvmrc').length).to.equal(0);
       });
