@@ -7,7 +7,7 @@ module.exports = ({log, watch, inTeamCity, projectConfig}) => {
   function jest() {
     const config = projectConfig.jestConfig();
 
-    if (inTeamCity()) {
+    if (inTeamCity) {
       config.testResultsProcessor = path.join(__dirname, 'node_modules', 'jest-teamcity-reporter');
     }
 

@@ -14,7 +14,7 @@ const tryRequire = name => {
 
 module.exports = ({inTeamCity}) => {
   function fedopsSync() {
-    if (!inTeamCity()) {
+    if (!inTeamCity) {
       return Promise.resolve();
     }
 

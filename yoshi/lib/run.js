@@ -12,7 +12,7 @@ module.exports = (plugins, options) => {
   return plugins.reduce((promise, parallel) => {
     return promise.then(() => {
       return Promise.all(parallel.map(task => {
-        return require(task)({log, logIf, logIfP, watch, base, statics, isCI, projectConfig})(options)
+        return require(task)({log, logIf, logIfP, watch, base, statics, inTeamCity: isCI, projectConfig})(options)
           .catch(error => {
             logIfAny(error);
             if (!watch) {

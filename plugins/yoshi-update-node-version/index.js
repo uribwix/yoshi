@@ -18,7 +18,7 @@ function updateVersion() {
 
 module.exports = ({inTeamCity}) => {
   function updateNodeVersion() {
-    if (!inTeamCity()) {
+    if (!inTeamCity) {
       updateVersion();
     }
 
