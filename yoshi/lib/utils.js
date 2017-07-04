@@ -83,8 +83,7 @@ module.exports.watchMode = value => {
   return !!process.env.WIX_NODE_BUILD_WATCH_MODE;
 };
 
-module.exports.inTeamCity = () =>
-  process.env.BUILD_NUMBER || process.env.TEAMCITY_VERSION;
+module.exports.inTeamCity = () => require('is-ci');
 
 module.exports.isProduction = () => (process.env.NODE_ENV || '').toLowerCase() === 'production';
 
