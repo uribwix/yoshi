@@ -12,6 +12,19 @@ const readDir = module.exports.readDir = patterns =>
   [].concat(patterns).reduce((acc, pattern) =>
     acc.concat(glob.sync(pattern)), []);
 
+module.exports.copyFile = (source, target) => new Promise((resolve, reject) => {
+  const done = err => err ? reject(err) : resolve();
+
+  const rd = fs.createReadStream(source)
+    .on('error', err => done(err));
+
+  const wr = fs.createWriteStream(target)
+    .on('error', err => done(err))
+    .on('close', err => done(err));
+
+  rd.pipe(wr);
+});
+
 const exists = module.exports.exists = patterns => !!readDir(patterns).length;
 
 const tryRequire = module.exports.tryRequire = name => {
@@ -72,6 +85,8 @@ module.exports.watchMode = value => {
 
 module.exports.inTeamCity = () =>
   process.env.BUILD_NUMBER || process.env.TEAMCITY_VERSION;
+
+module.exports.isProduction = () => (process.env.NODE_ENV || '').toLowerCase() === 'production';
 
 module.exports.filterNoise = comp => {
   comp.plugin('done', stats => {

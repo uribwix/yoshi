@@ -1,6 +1,5 @@
 'use strict';
 
-const webpack = require('webpack');
 const path = require('path');
 const context = path.resolve('./src');
 const projectConfig = require('./project');
@@ -25,7 +24,6 @@ const config = {
   },
 
   plugins: [
-    new webpack.IgnorePlugin(/^electron$/),
     new CaseSensitivePathsPlugin()
   ],
 

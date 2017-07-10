@@ -49,7 +49,7 @@ In your `package.json`:
 }
 ```
 
-Or within the command-line:
+Or within the command line:
 
 ```console
 yoshi [command] [options]
@@ -207,6 +207,11 @@ We use [css modules](https://github.com/css-modules/css-modules) as default. You
     "cssModules": false
   }
   ```
+
+  Disabling cssModules on a specific css file is possible by adding `.global` before file extention.
+  For example:
+  
+  `./Counter.global.scss` //no css modules for this file
 
   Using css modules inside your component is easy:
 

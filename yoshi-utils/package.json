@@ -1,0 +1,31 @@
+{
+  "name": "yoshi-utils",
+  "version": "1.0.0",
+  "description": "Yoshi Utils library",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha './test/{,!(fixtures)/**/}/*.spec.js' --timeout 2000 --reporter mocha-env-reporter",
+    "build": "eslint .",
+    "release": "wnpm-release --no-shrinkwrap"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "author": "Yaniv Efraim",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.16.1",
+    "eslint-config-wix": "^1.1.4",
+    "mocha": "^3.2.0",
+    "mocha-env-reporter": "^2.0.4",
+    "mockery": "^2.1.0",
+    "wnpm-ci": "latest"
+  },
+  "eslintConfig": {
+    "extends": "wix"
+  },
+  "dependencies": {
+    "is-ci": "^1.0.10"
+  }
+}

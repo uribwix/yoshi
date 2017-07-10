@@ -120,7 +120,6 @@ describe('Aggregator: e2e', () => {
       .execute('test', ['--protractor']);
 
     expect(res.code).to.equal(0);
-    console.log('wat', res.stdout);
     expect(res.stdout).to.not.contain('protractor');
   });
 
@@ -129,7 +128,19 @@ describe('Aggregator: e2e', () => {
 
     test
       .setup(singleModuleWithCssModules(), [hooks.installDependencies, hooks.installProtractor])
-      .execute('build');
+      .execute('build', [], outsideTeamCity);
+
+    const res = test.execute('test', ['--protractor'], outsideTeamCity);
+
+    expect(res.code).to.equal(0);
+  });
+
+  it('should pre-process sass with cssModules on', function () {
+    this.timeout(60000);
+
+    test
+      .setup(singleModuleWithCssModulesAndSass(), [hooks.installDependencies, hooks.installProtractor])
+      .execute('build', [], outsideTeamCity);
 
     const res = test.execute('test', ['--protractor'], outsideTeamCity);
 
@@ -220,6 +231,18 @@ describe('Aggregator: e2e', () => {
         document.body.innerHTML = style.className;
       `,
       'src/some.css': `.class-name {color: green;}`,
+      'package.json': fx.packageJson(cdnConfigurations(), {express: 'latest'})
+    };
+  }
+
+  function singleModuleWithCssModulesAndSass() {
+    return {
+      'protractor.conf.js': fx.protractorConfWithStatics(),
+      'test/some.e2e.js': fx.e2eTestWithCssModulesAndSass(),
+      'src/client.js': `const style = require('./some.scss');
+        document.body.innerHTML = style.className;
+      `,
+      'src/some.scss': `$txt-color:green; .class-name { color: $txt-color }`,
       'package.json': fx.packageJson(cdnConfigurations(), {express: 'latest'})
     };
   }

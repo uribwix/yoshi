@@ -1,4 +1,6 @@
 'use strict';
+
+const sass = require('node-sass');
 const {tryRequire} = require('../lib/utils');
 
 
@@ -41,7 +43,12 @@ const merged = ld.mergeWith({
       rootDir,
       generateScopedName: require('./css-scope-pattern'),
       extensions: ['.scss', '.css'],
-      camelCase: true
+      camelCase: true,
+
+      preprocessCss: data => sass.renderSync({
+        data,
+        includePaths: ['node_modules', 'node_modules/compass-mixins/lib']
+      }).css
     });
 
     return start({host: 'localhost'}).then(server => {

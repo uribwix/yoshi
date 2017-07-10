@@ -24,7 +24,8 @@ function tests(options) {
 module.exports = options => ({
   build: [
     ['yoshi-clean', 'yoshi-update-node-version'],
-    ['yoshi-sass', './tasks/less', 'yoshi-petri', 'yoshi-maven-statics', 'yoshi-copy', transpiler(), './tasks/bundle']
+    ['yoshi-sass', './tasks/less', 'yoshi-petri', 'yoshi-maven-statics', 'yoshi-copy', transpiler(), './tasks/bundle'],
+    ['yoshi-fedops-build-report']
   ],
   lint: [[linter, 'yoshi-stylelint']],
   release: [['yoshi-wnpm-release']],
