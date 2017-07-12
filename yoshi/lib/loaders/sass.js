@@ -5,11 +5,12 @@ const {merge} = require('lodash/fp');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const {cssModulesPattren} = require('yoshi-runtime');
 
-module.exports = (separateCss, cssModules, tpaStyle) => {
+module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
   const cssLoaderOptions = {
     camelCase: true,
     sourceMap: !!separateCss,
     localIdentName: cssModulesPattren(),
+    hashPrefix: projectName,
     modules: cssModules,
     importLoaders: tpaStyle ? 4 : 3
   };

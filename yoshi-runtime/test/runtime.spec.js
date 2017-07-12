@@ -29,7 +29,7 @@ describe('CSS modules pattern', () => {
 describe('CSS modules runtime', () => {
   const generateCssModulesPattern = (name, path, pattern = `[hash:base64:5]`) => {
     const genericNames = require('generic-names');
-    const generate = genericNames(pattern);
+    const generate = genericNames(pattern, {hashPrefix: 'pkg'});
     return generate(name, path);
   };
 
@@ -49,7 +49,8 @@ describe('CSS modules runtime', () => {
           const s = require('./styles/my-file.css')
           console.log(s);
         `,
-        'dist/src/styles/my-file.css': `.a {color: red;}`
+        'dist/src/styles/my-file.css': `.a {color: red;}`,
+        'package.json': '{"name": "pkg"}'
       })
       .execute('');
 
@@ -70,7 +71,8 @@ describe('CSS modules runtime', () => {
           const s = require('module/styles/my-file.css')
           console.log(s);
         `,
-        'node_modules/module/styles/my-file.css': `.a {color: red;}`
+        'node_modules/module/styles/my-file.css': `.a {color: red;}`,
+        'package.json': '{"name": "pkg"}'
       })
       .execute('');
 
