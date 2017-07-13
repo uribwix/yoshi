@@ -24,12 +24,13 @@
     "react-addons-test-utils": "^15.3.2",
     "react-test-renderer": "^15.5.4",
     "express-session": "^1.14.2",
-    "jsdom-global": "^2.1.0",
+    "jsdom": "~11.1.0",
+    "jsdom-global": "~3.0.2",
     "enzyme": "^2.3.0",
     "chai": "^3.5.0"
   },
   "dependencies": {
-    "babel-polyfill": "^6.9.1",
+    "babel-polyfill": "^6.23.0",
     "react": "^15.3.2",
     "react-dom": "^15.3.2"
   },

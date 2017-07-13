@@ -142,6 +142,9 @@
     "graphite-tcp": "^1.0.4",
     "proxyquire": "^1.8.0",
     "fs-promise": "^2.0.3",
-    "jest-teamcity-reporter": "^0.6.2"
+    "jest-teamcity-reporter": "^0.6.2",
+    "babel-polyfill": "^6.23.0",
+    "jsdom-global": "~3.0.2",
+    "jsdom": "~11.1.0"
   }
 }

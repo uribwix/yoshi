@@ -24,7 +24,8 @@
     "eslint-plugin-jest": "^19.0.1",
     "express": "^4.13.4",
     "express-session": "^1.14.2",
-    "jsdom-global": "^2.1.0",
+    "jsdom-global": "~3.0.2",
+    "jsdom": "~11.1.0",
     "react-addons-test-utils": "^15.3.2",
     "require-reload": "^0.2.2",
     "trier-promise": "^1.0.1",
@@ -32,7 +33,7 @@
     "yoshi": "latest"
   },
   "dependencies": {
-    "babel-polyfill": "^6.9.1",
+    "babel-polyfill": "^6.23.0",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-loadable": "^3.0.1"
