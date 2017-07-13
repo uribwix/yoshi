@@ -5,7 +5,7 @@ const fx = require('./helpers/fixtures');
 const expect = require('chai').expect;
 const hooks = require('./helpers/hooks');
 const _ = require('lodash');
-const {outsideTeamCity} = require('./helpers/env-variables');
+const {getMockedCI} = require('yoshi-utils').utilsTestkit;
 
 describe('Loaders', () => {
   let test;
@@ -221,7 +221,7 @@ describe('Loaders', () => {
 
         it('should support nested sass imports when using "compose"', () => {
           test.setup(Object.assign({'package.json': fx.packageJson({})}, commonConfig))
-            .execute('build', [], outsideTeamCity);
+            .execute('build', [], getMockedCI({ci: false}));
           expect(test.content('dist/statics/app.css')).to.contain('background: blue');
           expect(test.content('dist/statics/app.bundle.js'))
             .to.match(/"some-rule":"some-css__some-rule\w+ base__foo\w+"/);
@@ -229,7 +229,7 @@ describe('Loaders', () => {
 
         it('should support nested sass imports when using "compose", when using wix-tpa-style-loader', () => {
           test.setup(Object.assign({'package.json': fx.packageJson({tpaStyle: true})}, commonConfig))
-            .execute('build', [], outsideTeamCity);
+            .execute('build', [], getMockedCI({ci: false}));
           expect(test.content('dist/statics/app.css')).to.contain('background: blue');
           expect(test.content('dist/statics/app.bundle.js'))
             .to.match(/"some-rule":"some-css__some-rule\w+ base__foo\w+"/);
@@ -271,7 +271,7 @@ describe('Loaders', () => {
           'src/foo.css': '.foo-rule { color: blue }',
           'package.json': fx.packageJson(config || {}),
         })
-        .execute('build', [], outsideTeamCity);
+        .execute('build', [], getMockedCI({ci: false}));
     }
   });
 
@@ -337,7 +337,7 @@ describe('Loaders', () => {
           'src/foo.css': '.foo-rule { color: blue }',
           'package.json': fx.packageJson(config || {}),
         })
-        .execute('build', [], outsideTeamCity);
+        .execute('build', [], getMockedCI({ci: false}));
     }
   });
 

@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const tp = require('./helpers/test-phases');
 const fx = require('./helpers/fixtures');
 const hooks = require('./helpers/hooks');
+const {getMockedCI} = require('yoshi-utils').utilsTestkit;
 const {
   outsideTeamCity,
   insideTeamCity
@@ -694,12 +695,9 @@ describe('Aggregator: Build', () => {
       const myTest = tp.create('src/index');
       const res = myTest
         .setup({
-          'src/index.js': `require('css-modules-require-hook')({
-              rootDir: './src',
-              generateScopedName: require('${__dirname}/../config/css-scope-pattern'),
-              extensions: ['.scss', '.css'],
-              camelCase: true
-            });
+          'src/index.js': `
+            const {configCssModules} = require('yoshi-runtime');
+            configCssModules('./src');
             const s = require('./styles/my-file.css')
             console.log(s);
           `,
@@ -708,7 +706,7 @@ describe('Aggregator: Build', () => {
             "name": "a",\n
             "version": "1.0.4",\n
             "dependencies": {\n
-              "css-modules-require-hook": "latest"\n
+              "yoshi-runtime": "latest"\n
             },
             "yoshi": {
               "cssModules": true,
@@ -757,7 +755,7 @@ describe('Aggregator: Build', () => {
           }),
           'pom.xml': fx.pom()
         })
-        .execute('build', [], outsideTeamCity);
+        .execute('build', [], getMockedCI({ci: false}));
 
       expect(res.code).to.equal(0);
       expect(test.content(`dist/${defaultOutput}/app.bundle.js`)).not.to.match(regex);
@@ -773,7 +771,7 @@ describe('Aggregator: Build', () => {
           'package.json': fx.packageJson(),
           'pom.xml': fx.pom()
         })
-        .execute('build', [], outsideTeamCity);
+        .execute('build', [], getMockedCI({ci: false}));
 
       expect(res.code).to.equal(0);
       expect(test.content(`dist/${defaultOutput}/app.bundle.js`)).not.to.match(regex);

@@ -128,6 +128,8 @@
     "trier-promise": "^1.0.1",
     "eslint": "^3.18.0",
     "eslint-config-wix": "^1.1.14",
+    "yoshi-runtime": "^1.0.7",
+    "yoshi-utils": "^1.0.0",
     "cross-spawn": "^5.1.0",
     "shelljs": "^0.7.6",
     "yeoman-generator": "^0.23.4",

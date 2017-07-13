@@ -7,6 +7,7 @@ const fx = require('./helpers/fixtures');
 const hooks = require('./helpers/hooks');
 const {exists} = require('../lib/utils');
 const {outsideTeamCity, insideTeamCity} = require('./helpers/env-variables');
+const {getMockedCI} = require('yoshi-utils').utilsTestkit;
 
 describe('Aggregator: e2e', () => {
   let test;
@@ -126,21 +127,9 @@ describe('Aggregator: e2e', () => {
 
     test
       .setup(singleModuleWithCssModules(), [hooks.installDependencies, hooks.installProtractor])
-      .execute('build', [], outsideTeamCity);
+      .execute('build', [], getMockedCI({ci: false}));
 
-    const res = test.execute('test', ['--protractor'], outsideTeamCity);
-
-    expect(res.code).to.equal(0);
-  });
-
-  it('should pre-process sass with cssModules on', function () {
-    this.timeout(60000);
-
-    test
-      .setup(singleModuleWithCssModulesAndSass(), [hooks.installDependencies, hooks.installProtractor])
-      .execute('build', [], outsideTeamCity);
-
-    const res = test.execute('test', ['--protractor'], outsideTeamCity);
+    const res = test.execute('test', ['--protractor'], getMockedCI({ci: false}));
 
     expect(res.code).to.equal(0);
   });
@@ -229,19 +218,6 @@ describe('Aggregator: e2e', () => {
         document.body.innerHTML = style.className;
       `,
       'src/some.css': `.class-name {color: green;}`,
-      'package.json': fx.packageJson(cdnConfigurations(), {express: 'latest'})
-    };
-  }
-
-  function singleModuleWithCssModulesAndSass() {
-    return {
-      'protractor.conf.js': fx.protractorConfWithStatics(),
-      'test/some.e2e.js': fx.e2eTestWithCssModulesAndSass(),
-      'src/client.js': `const style = require('./some.scss');
-        document.body.innerHTML = style.className;
-      `,
-      'src/some-2.scss': `$txt-color:green; .class-name { color: $txt-color }`,
-      'src/some.scss': `@import "./some-2.scss"`,
       'package.json': fx.packageJson(cdnConfigurations(), {express: 'latest'})
     };
   }

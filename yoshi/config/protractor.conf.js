@@ -1,8 +1,7 @@
 'use strict';
 
-const sass = require('node-sass');
 const {tryRequire} = require('../lib/utils');
-
+const {configCssModules} = require('yoshi-runtime');
 
 //Private wix applitools key
 //skip wix' key for applitools
@@ -39,18 +38,7 @@ const merged = ld.mergeWith({
 
   beforeLaunch: () => {
     const rootDir = './src';
-    require('css-modules-require-hook')({
-      rootDir,
-      generateScopedName: require('./css-scope-pattern'),
-      extensions: ['.scss', '.css'],
-      camelCase: true,
-
-      preprocessCss: (data, file) => sass.renderSync({
-        data,
-        file,
-        includePaths: ['node_modules', 'node_modules/compass-mixins/lib']
-      }).css
-    });
+    configCssModules(rootDir);
 
     return start({host: 'localhost'}).then(server => {
       cdnServer = server;

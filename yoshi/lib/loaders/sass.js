@@ -3,13 +3,13 @@
 const path = require('path');
 const {merge} = require('lodash/fp');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const localIdentName = require('../../config/css-scope-pattern');
+const {cssModulesPattren} = require('yoshi-runtime');
 
 module.exports = (separateCss, cssModules, tpaStyle) => {
   const cssLoaderOptions = {
     camelCase: true,
     sourceMap: !!separateCss,
-    localIdentName,
+    localIdentName: cssModulesPattren(),
     modules: cssModules,
     importLoaders: tpaStyle ? 4 : 3
   };

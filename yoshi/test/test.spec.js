@@ -5,6 +5,7 @@ const tp = require('./helpers/test-phases');
 const fx = require('./helpers/fixtures');
 const {outsideTeamCity, insideTeamCity} = require('./helpers/env-variables');
 const hooks = require('./helpers/hooks');
+const {getMockedCI} = require('yoshi-utils').utilsTestkit;
 
 describe('Aggregator: Test', () => {
   let test;
@@ -672,7 +673,7 @@ describe('Aggregator: Test', () => {
             'karma.conf.js': fx.karmaWithJasmine(),
             'package.json': fx.packageJson({cssModules: true})
           })
-          .execute('test', ['--karma']);
+          .execute('test', ['--karma'], getMockedCI({ci: false}));
         expect(res.code).to.equal(0);
       });
 
