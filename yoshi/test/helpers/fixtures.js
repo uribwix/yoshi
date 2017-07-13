@@ -141,6 +141,14 @@ const fx = {
       expect(element(by.css("body")).getText()).toEqual(className);
     });
   `,
+  e2eTestWithCssModulesAndSass: () => `
+    const {className} = require('../src/some.scss');
+    it("should write some text to body", () => {
+      browser.ignoreSynchronization = true;
+      browser.get("http://localhost:1337");
+      expect(element(by.css("body")).getText()).toEqual(className);
+    });
+  `,
   e2eClient: () => `document.body.innerHTML = "Hello Kitty";`,
   pom: () => `
     <?xml version="1.0" encoding="UTF-8"?>
