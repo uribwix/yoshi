@@ -5,6 +5,7 @@ module.exports = function (wallaby) {
       {pattern: 'src/templates/**', instrument: false},
       {pattern: 'test/**/*.spec.[j|t]s', ignore: true},
       {pattern: 'test/**/*.spec.[j|t]sx', ignore: true},
+      {pattern: 'test/**/*.e2e.[j|t]s', ignore: true},
       {pattern: 'src/**/*.spec.[j|t]s', ignore: true},
       {pattern: 'src/**/*.spec.[j|t]sx', ignore: true},
       {pattern: 'src/assets/**', instrument: false},
