@@ -12,7 +12,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "del": "^2.2.2"
+    "del": "~3.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

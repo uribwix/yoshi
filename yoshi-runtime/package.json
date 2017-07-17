@@ -27,8 +27,8 @@
     "extends": "wix"
   },
   "dependencies": {
-    "css-modules-require-hook": "^4.0.6",
-    "generic-names": "^1.0.2",
+    "css-modules-require-hook": "~4.0.6",
+    "generic-names": "~1.0.2",
     "yoshi-utils": "^1.0.0"
   }
 }

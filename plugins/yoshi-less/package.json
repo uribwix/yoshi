@@ -14,9 +14,9 @@
   "dependencies": {
     "fs-promise": "^2.0.3",
     "glob": "^7.1.2",
-    "gulp": "^3.9.1",
-    "less": "^2.7.2",
-    "mkdirp": "^0.5.1"
+    "gulp": "~3.9.1",
+    "less": "~2.7.2",
+    "mkdirp": "~0.5.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

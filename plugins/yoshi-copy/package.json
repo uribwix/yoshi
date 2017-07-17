@@ -13,9 +13,9 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "gulp": "^3.9.1",
+    "gulp": "~3.9.1",
     "glob": "^7.1.2",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "~0.5.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

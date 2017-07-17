@@ -12,17 +12,17 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "jest-cli": "^20.0.4",
+    "jest-cli": "~20.0.4",
     "jest-teamcity-reporter": "^0.6.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "eslint": "^3.18.0",
     "eslint-config-wix": "^1.1.14",
-    "intercept-stdout": "^0.1.2",
+    "intercept-stdout": "~0.1.2",
     "mocha": "^3.2.0",
     "mocha-env-reporter": "^2.0.4",
-    "strip-ansi": "^3.0.1",
+    "strip-ansi": "~4.0.0",
     "test-phases": "latest",
     "wnpm-ci": "latest"
   },
