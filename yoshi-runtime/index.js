@@ -14,7 +14,7 @@ module.exports.wixCssModulesRequireHook = (rootDir = './dist/src') => {
       }
       return generate(name, filepath);
     },
-    extensions: ['.scss', '.css'],
+    extensions: ['.scss', '.css', '.less', '.sass'],
     camelCase: true
   });
 };
