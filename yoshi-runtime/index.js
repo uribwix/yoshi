@@ -4,7 +4,7 @@ const genericNames = require('generic-names');
 const cssModulesPattren = module.exports.cssModulesPattren = () =>
   (isProduction() || isCI()) ? `[hash:base64:5]` : `[path][name]__[local]__[hash:base64:5]`;
 
-module.exports.configCssModules = rootDir => {
+const wixCssModulesRequireHook = module.exports.wixCssModulesRequireHook = rootDir => {
   require('css-modules-require-hook')({
     rootDir,
     generateScopedName: (name, filepath) => {
@@ -18,3 +18,5 @@ module.exports.configCssModules = rootDir => {
     camelCase: true
   });
 };
+
+module.exports.configCssModules = rootDir => wixCssModulesRequireHook(rootDir);

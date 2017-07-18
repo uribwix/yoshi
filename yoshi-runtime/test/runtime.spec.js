@@ -44,8 +44,8 @@ describe('CSS modules runtime', () => {
     const myTest = create('dist/src/index');
     const res = myTest
       .setup({
-        'dist/src/index.js': `const {configCssModules} = require('${require.resolve('../index')}');
-          configCssModules('./dist/src');
+        'dist/src/index.js': `const {wixCssModulesRequireHook} = require('${require.resolve('../index')}');
+          wixCssModulesRequireHook('./dist/src');
           const s = require('./styles/my-file.css')
           console.log(s);
         `,
@@ -65,8 +65,8 @@ describe('CSS modules runtime', () => {
     const myTest = create('dist/src/index');
     const res = myTest
       .setup({
-        'dist/src/index.js': `const {configCssModules} = require('${require.resolve('../index')}');
-          configCssModules('./dist/src');
+        'dist/src/index.js': `const {wixCssModulesRequireHook} = require('${require.resolve('../index')}');
+          wixCssModulesRequireHook('./dist/src');
           const s = require('module/styles/my-file.css')
           console.log(s);
         `,
