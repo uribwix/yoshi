@@ -696,8 +696,8 @@ describe('Aggregator: Build', () => {
       const res = myTest
         .setup({
           'src/index.js': `
-            const {configCssModules} = require('yoshi-runtime');
-            configCssModules('./src');
+            const {wixCssModulesRequireHook} = require('yoshi-runtime');
+            wixCssModulesRequireHook('./src');
             const s = require('./styles/my-file.css')
             console.log(s);
           `,
