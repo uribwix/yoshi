@@ -12,18 +12,18 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "fs-promise": "^2.0.3",
-    "glob": "^7.1.2",
+    "fs-promise": "~2.0.3",
+    "glob": "~7.1.2",
     "gulp": "~3.9.1",
     "less": "~2.7.2",
     "mkdirp": "~0.5.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^3.18.0",
-    "eslint-config-wix": "^1.1.14",
-    "mocha": "^3.2.0",
-    "mocha-env-reporter": "^2.0.4",
+    "chai": "~3.5.0",
+    "eslint": "~3.19.0",
+    "eslint-config-wix": "~1.1.14",
+    "mocha": "~3.4.2",
+    "mocha-env-reporter": "~2.0.4",
     "test-phases": "latest",
     "wnpm-ci": "latest"
   },

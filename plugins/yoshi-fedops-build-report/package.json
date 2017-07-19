@@ -12,12 +12,12 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^3.18.0",
-    "eslint-config-wix": "^1.1.14",
-    "mocha": "^3.2.0",
-    "mocha-env-reporter": "^2.0.4",
-    "proxyquire": "^1.8.0",
+    "chai": "~3.5.0",
+    "eslint": "~3.19.0",
+    "eslint-config-wix": "~1.1.14",
+    "mocha": "~3.4.2",
+    "mocha-env-reporter": "~2.0.4",
+    "proxyquire": "~1.8.0",
     "sinon": "~2.3.8",
     "sinon-chai": "~2.11.0",
     "strip-ansi": "~4.0.0",
@@ -28,7 +28,7 @@
     "extends": "wix"
   },
   "dependencies": {
-    "glob": "^7.1.2",
-    "graphite-tcp": "^1.0.4"
+    "glob": "~7.1.2",
+    "graphite-tcp": "~1.0.4"
   }
 }
