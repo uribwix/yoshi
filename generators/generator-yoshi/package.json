@@ -13,8 +13,7 @@
   "scripts": {
     "build": "eslint .",
     "test": "rm -rf generated-examples; mocha -R mocha-env-reporter",
-    "release": "npm shrinkwrap && wnpm-release && sh auto-generate-examples.sh",
-    "postpublish": "rm -f npm-shrinkwrap.json"
+    "release": "wnpm-release --no-shrinkwrap && sh auto-generate-examples.sh"
   },
   "bin": {
     "wixclean": "./bin/wixclean.sh"
