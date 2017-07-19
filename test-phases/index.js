@@ -25,7 +25,7 @@ class Test {
     Object.keys(flat).forEach(file => {
       this.write(file, flat[file]);
     });
-    (hooks || []).forEach(hook => hook(this.tmp, cwd));
+    (hooks || []).forEach(hook => hook(this.tmp));
     return this;
   }
 
