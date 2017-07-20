@@ -29,7 +29,7 @@ describe('CSS modules pattern', () => {
 describe('CSS modules runtime', () => {
   const generateCssModulesPattern = (name, path, pattern = `[hash:base64:5]`) => {
     const genericNames = require('generic-names');
-    const generate = genericNames(pattern, {context: './dist/src', hashPrefix: 'pkg'});
+    const generate = genericNames(pattern, {hashPrefix: 'pkg'});
     return generate(name, path);
   };
 
