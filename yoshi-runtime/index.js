@@ -5,7 +5,7 @@ const path = require('path');
 const cssModulesPattren = module.exports.cssModulesPattren = () =>
   (isProduction() || isCI()) ? `[hash:base64:5]` : `[path][name]__[local]__[hash:base64:5]`;
 
-module.exports.configCssModules = rootDir => {
+module.exports.wixCssModulesRequireHook = (rootDir = './dist/src') => {
   require('css-modules-require-hook')({
     rootDir,
     generateScopedName: (name, filepath) => {
