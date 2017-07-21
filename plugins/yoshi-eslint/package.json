@@ -12,15 +12,15 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "eslint": "^3.18.0",
-    "glob": "^7.1.2"
+    "eslint": "~3.19.0",
+    "glob": "~7.1.2"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint-config-wix": "^1.1.14",
+    "chai": "~3.5.0",
+    "eslint-config-wix": "~1.1.14",
     "intercept-stdout": "~0.1.2",
-    "mocha": "^3.2.0",
-    "mocha-env-reporter": "^2.0.4",
+    "mocha": "~3.4.2",
+    "mocha-env-reporter": "~2.0.4",
     "strip-ansi": "~4.0.0",
     "test-phases": "latest",
     "wnpm-ci": "latest"

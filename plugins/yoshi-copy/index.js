@@ -21,6 +21,7 @@ function matchFiles(patterns) {
 }
 
 function copy(filePath, destination, base) {
+  filePath = path.normalize(filePath);
   const dest = path.resolve('dist', destination);
   const relative = filePath.replace(path.resolve(base), '');
   return copyFile(filePath, path.join(dest, relative));

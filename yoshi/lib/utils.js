@@ -97,7 +97,8 @@ module.exports.filterNoise = comp => {
       assets: false,
       children: false,
       version: false,
-      timings: false
+      timings: false,
+      modules: false
     }));
     mkdirp.sync(path.resolve('target'));
     fs.writeFileSync('target/webpack-stats.json', JSON.stringify(stats.toJson()));

@@ -16,7 +16,7 @@ module.exports.wixCssModulesRequireHook = (rootDir = './dist/src') => {
       const generate = genericNames(cssModulesPattren(), {context: rootDir, hashPrefix});
       return generate(name, filepath);
     },
-    extensions: ['.scss', '.css'],
+    extensions: ['.scss', '.css', '.less', '.sass'],
     camelCase: true
   });
 };
