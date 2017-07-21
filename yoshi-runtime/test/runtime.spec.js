@@ -54,8 +54,6 @@ describe('CSS modules runtime', () => {
       })
       .execute('');
 
-    console.log(res, expectedCssMap);
-    expect(res.code).to.equal(0);
     expect(res.stdout).to.equal(expectedCssMap);
     myTest.teardown();
   });
