@@ -429,7 +429,7 @@ describe('Loaders', () => {
     );
 
     it('should embed json file into bundle', () =>
-      expect(test.content('dist/statics/app.bundle.js')).to.contain('"json-content": 42')
+      expect(test.content('dist/statics/app.bundle.js')).to.contain('"json-content":42')
     );
   });
 
