@@ -696,7 +696,7 @@ describe('Aggregator: Build', () => {
       const res = myTest
         .setup({
           'src/index.js': `
-            const {wixCssModulesRequireHook} = require('${require.resolve('../../yoshi-runtime')}');
+            const {wixCssModulesRequireHook} = require('yoshi-runtime');
             wixCssModulesRequireHook('./src');
             const s = require('./styles/my-file.css')
             console.log(s);
