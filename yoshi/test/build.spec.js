@@ -605,7 +605,7 @@ describe('Aggregator: Build', () => {
 
     const generateCssModulesPattern = (name, path, pattern = `[hash:base64:5]`) => {
       const genericNames = require('generic-names');
-      const generate = genericNames(pattern);
+      const generate = genericNames(pattern, {hashPrefix: 'a'});
       return generate(name, path);
     };
 
@@ -696,7 +696,7 @@ describe('Aggregator: Build', () => {
       const res = myTest
         .setup({
           'src/index.js': `
-            const {wixCssModulesRequireHook} = require('yoshi-runtime');
+            const {wixCssModulesRequireHook} = require('${require.resolve('../../yoshi-runtime')}');
             wixCssModulesRequireHook('./src');
             const s = require('./styles/my-file.css')
             console.log(s);
