@@ -1,7 +1,6 @@
 'use strict';
 
 const sass = require('node-sass');
-const projectConfig = require('./project');
 const {tryRequire} = require('../lib/utils');
 const {cssModulesPattren} = require('yoshi-runtime');
 
@@ -44,7 +43,6 @@ const merged = ld.mergeWith({
       rootDir,
       generateScopedName: cssModulesPattren(),
       extensions: ['.scss', '.css'],
-      hashPrefix: projectConfig.name(),
       camelCase: true,
 
       preprocessCss: (data, file) => sass.renderSync({
