@@ -21,7 +21,7 @@ function renderSass(options) {
   );
 }
 
-function renderFile(file) {
+function renderFile(file, outputDirs) {
   const options = {
     file: path.resolve(file),
     includePaths: ['node_modules', 'node_modules/compass-mixins/lib'],
@@ -29,11 +29,17 @@ function renderFile(file) {
   };
 
   return renderSass(options)
-    .then(result => writeFileIntoDir(path.resolve('dist', file), result.css));
+    .then(result => Promise.all(
+      outputDirs.map(dir => writeFileIntoDir(path.resolve(dir, file), result.css))
+    ));
 }
 
-module.exports = ({logIf, base, watch}) => {
+module.exports = ({logIf, base, watch, projectConfig}) => {
   const pattern = `${base()}/**/*.scss`;
+
+  const outputDirs = projectConfig.isEsModule() && !watch ?
+    ['dist', 'dist/es'] :
+    ['dist'];
 
   function sass() {
     if (watch) {
@@ -44,7 +50,7 @@ module.exports = ({logIf, base, watch}) => {
   }
 
   function transpile() {
-    return Promise.all(readDir(pattern).map(renderFile));
+    return Promise.all(readDir(pattern).map(file => renderFile(file, outputDirs)));
   }
 
   return logIf(sass, () => readDir(pattern).length > 0);

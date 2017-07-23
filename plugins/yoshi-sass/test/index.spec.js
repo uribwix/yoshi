@@ -13,7 +13,15 @@ describe('Sass', () => {
 
   beforeEach(() => test = tp.create());
   beforeEach(() => process.chdir(test.tmp));
-  beforeEach(() => task = sass({base: () => 'src', logIf: a => a}));
+  beforeEach(() => task = ({watch = false, esModule = false} = {}) =>
+    sass({
+      base: () => 'src',
+      logIf: a => a,
+      watch,
+      projectConfig: {
+        isEsModule: () => esModule
+      }
+    })());
   afterEach(() => test.teardown());
 
   it('should transpile to dist/, preserve folder structure, extensions and exit with code 0', () => {
@@ -73,6 +81,34 @@ describe('Sass', () => {
     return task()
       .then(() => {
         expect(test.list('dist', '-R')).not.to.contain('app/a/_partial.scss');
+      });
+  });
+
+  it('should also copy files to dist/es when there\'s a `module` field in package.json', () => {
+    const compiledStyle = '.a .b {\n  color: red; }';
+
+    test.setup({
+      'src/b/style.scss': scss()
+    });
+
+    return task({esModule: true})
+      .then(() => {
+        expect(test.content('dist/es/src/b/style.scss')).to.contain(compiledStyle);
+        expect(test.content('dist/src/b/style.scss')).to.contain(compiledStyle);
+      });
+  });
+
+  it('should not copy files to dist/es when in watch mode', () => {
+    const compiledStyle = '.a .b {\n  color: red; }';
+
+    test.setup({
+      'src/b/style.scss': scss()
+    });
+
+    return task({watch: true, esModule: true})
+      .then(() => {
+        expect(test.list('dist')).to.not.contain('es');
+        expect(test.content('dist/src/b/style.scss')).to.contain(compiledStyle);
       });
   });
 });
