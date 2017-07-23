@@ -120,6 +120,29 @@ describe('Jest', () => {
     });
   });
 
+  it('should transpile ES modules out of the box', () => {
+    test.setup({
+      '__tests__/foo.js': `
+        import a from '../a';
+        describe('Foo', () => {
+          it('should return value', () => {
+            expect(a).toBe(1);
+          });
+        });
+      `,
+      'a.js': `
+        export default 1;
+      `
+    });
+
+    const task = createTask();
+
+    return task()
+      .then(() => {
+        expect(stdout).to.contain('1 passed');
+      });
+  });
+
   // it('should work load jest configuration and work with css', () => {
   //   const res = test
   //     .setup({
