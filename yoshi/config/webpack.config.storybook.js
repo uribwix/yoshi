@@ -3,7 +3,6 @@ const webpackCommonConfig = require('./webpack.config.common');
 const projectConfig = require('./project');
 
 module.exports = config => {
-  const projectName = projectConfig.name();
 
   const cssModules = projectConfig.cssModules();
 
