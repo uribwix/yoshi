@@ -4,7 +4,6 @@ const projectConfig = require('./project');
 
 module.exports = config => {
   const projectName = projectConfig.name();
-
   const cssModules = projectConfig.cssModules();
 
   config.resolve.extensions = union(config.resolve.extensions, webpackCommonConfig.resolve.extensions);
