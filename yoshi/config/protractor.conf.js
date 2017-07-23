@@ -54,6 +54,8 @@ const merged = ld.mergeWith({
       }).css
     });
 
+    require('../lib/require-hooks');
+
     return start({host: 'localhost'}).then(server => {
       cdnServer = server;
       return beforeLaunch.call(merged);
