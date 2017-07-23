@@ -32,6 +32,7 @@ module.exports = {
   },
   isUniversalProject: () => getConfig('universalProject'),
   isAngularProject: () => !!_.get(packagejson, 'dependencies.angular', false) || !!_.get(packagejson, 'peerDependencies.angular', false),
+  isEsModule: () => !!_.get(packagejson, 'module', false),
   servers: {
     cdn: {
       port: () => getConfig('servers.cdn.port', 3200),

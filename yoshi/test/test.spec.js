@@ -404,6 +404,24 @@ describe('Aggregator: Test', () => {
         expect(res.code).to.equal(0);
         expect(res.stdout).to.contain('1 passing');
       });
+
+      it('should transpile es modules w/o any configurations', () => {
+        const res = test
+          .setup({
+            '.babelrc': '{}',
+            'test/some.spec.js': `
+            import assert from 'assert';
+            it.only("pass", () => {
+              assert.equal(1, 1);
+            });
+          `,
+            'package.json': fx.packageJson()
+          }, [hooks.installDependencies])
+          .execute('test', ['--mocha']);
+
+        expect(res.code).to.equal(0);
+        expect(res.stdout).to.contain('1 passing');
+      });
     });
 
     it('should run typescript tests with runtime compilation for ts projects', () => {

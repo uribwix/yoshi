@@ -5,6 +5,7 @@ const tp = require('test-phases');
 const stripAnsi = require('strip-ansi');
 const intercept = require('intercept-stdout');
 const babel = require('../index');
+const hooks = require('./helpers/hooks');
 
 describe('Babel', () => {
   let test;
@@ -17,7 +18,9 @@ describe('Babel', () => {
   }));
   beforeEach(() => test = tp.create());
   beforeEach(() => process.chdir(test.tmp));
-  beforeEach(() => task = babel({log: a => a, base: () => 'src'}));
+  beforeEach(() => task = ({watch = false, esModule = false} = {}) => babel({log: a => a, base: () => 'src', watch, projectConfig: {
+    isEsModule: () => esModule
+  }})());
 
   afterEach(() => test.teardown());
   afterEach(() => stdout = '');
@@ -105,6 +108,65 @@ describe('Babel', () => {
         .then(() => {
           expect(test.list('.', '-RA')).to.contain('target/.babel-cache');
         });
+    });
+
+    describe('Transpile twice for ES modules', () => {
+
+      it('should transpile twice if there\'s a `module` field in package.json', () => {
+        test.setup({
+          'package.json': `{
+            "name": "a",
+            "version": "1.0.4",
+            "module": "./dist/es/src/a.js",
+            "dependencies": {
+              "babel-preset-es2015": "latest"
+            },
+            "babel": {
+              "presets": [
+                ["es2015", {
+                  "modules": false
+                }]
+              ]
+            }
+          }`,
+          'src/a.js': `import b from './b'`,
+          'src/b.js': 'export default 1'
+        }, [hooks.installDependencies]);
+
+        return task({esModule: true})
+          .then(() => {
+            expect(test.content('dist/src/a.js')).to.contain(`require('./b')`);
+            expect(test.content('dist/es/src/a.js')).to.contain(`import b from './b'`);
+          });
+      });
+
+      it('should not transpile twice when in watch mode', () => {
+        test.setup({
+          'package.json': `{
+            "name": "a",
+            "version": "1.0.4",
+            "module": "./dist/es/src/a.js",
+            "dependencies": {
+              "babel-preset-es2015": "latest"
+            },
+            "babel": {
+              "presets": [
+                ["es2015", {
+                  "modules": false
+                }]
+              ]
+            }
+          }`,
+          'src/a.js': `import b from './b'`,
+          'src/b.js': 'export default 1'
+        }, [hooks.installDependencies]);
+
+        return task({watch: true, esModule: true})
+          .then(() => {
+            expect(test.content('dist/src/a.js')).to.contain(`require('./b')`);
+            expect(test.contains('dist/es')).to.be.false;
+          });
+      });
     });
   });
 });

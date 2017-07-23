@@ -35,10 +35,10 @@ function printErrors(err) {
   console.log(message);
 }
 
-module.exports = ({log, watch, base}) => {
+module.exports = ({log, watch, base, projectConfig}) => {
   const files = [path.join(base(), '**', '*.js{,x}'), 'index.js'];
 
-  function transpile() {
+  function transpile({babelConfig = {}, destDir = 'dist'}) {
     return new Promise((resolve, reject) => {
       const interceptor = createInterceptor(resolve, reject);
 
@@ -48,16 +48,33 @@ module.exports = ({log, watch, base}) => {
         .pipe(interceptor.catchErrors())
         .pipe(fileTransformCache({
           path: path.resolve('target', '.babel-cache'),
-          transformStreams: [sourcemaps.init(), babelTranspiler()]
+          transformStreams: [sourcemaps.init(), babelTranspiler(babelConfig)]
         }))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest(destDir))
         .once('end', interceptor.flush);
     });
   }
 
   function babel({done = noop} = {}) {
-    const transpileThenDone = () => transpile().then(done);
+    const transpileEsModules = projectConfig.isEsModule() && !watch;
+
+    const transpileFn = () => transpile({
+      destDir: transpileEsModules ? 'dist/es' : 'dist'
+    });
+
+    const transpileWithCommonJsFn = () => transpile({
+      destDir: 'dist',
+      babelConfig: {
+        plugins: [
+          require.resolve('babel-plugin-transform-es2015-modules-commonjs')
+        ]
+      }
+    });
+
+    const transpileThenDone = () => Promise.all(
+      [transpileWithCommonJsFn(), ...transpileEsModules ? [transpileFn()] : []]
+    ).then(done);
 
     if (watch) {
       gulp.watch(files, transpileThenDone);
