@@ -3,6 +3,7 @@ const webpackCommonConfig = require('./webpack.config.common');
 const projectConfig = require('./project');
 
 module.exports = config => {
+  const projectName = projectConfig.name();
 
   const cssModules = projectConfig.cssModules();
 
@@ -10,7 +11,7 @@ module.exports = config => {
 
   config.module.rules = [
     ...webpackCommonConfig.module.rules,
-    ...require('../lib/loaders/sass')(false, cssModules, false).client
+    ...require('../lib/loaders/sass')(false, cssModules, false, projectName).client
   ];
 
   return config;
