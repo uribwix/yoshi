@@ -1,15 +1,22 @@
 'use strict';
 
+const {merge} = require('lodash');
 const jestCli = require('jest-cli');
-const config = require('../../config/project').jestConfig();
+const jestProjectConfig = require('../../config/project').jestConfig();
 const {inTeamCity} = require('../utils');
 
 module.exports = ({log, watch}) => {
   function jest() {
     if (inTeamCity()) {
-      config.testResultsProcessor = 'jest-teamcity-reporter';
+      jestProjectConfig.testResultsProcessor = 'jest-teamcity-reporter';
       process.argv.push('--teamcity');
     }
+
+    const config = merge(jestProjectConfig, {
+      transform: {
+        '\\.jsx?$': require.resolve('../../config/jest-transformer')
+      }
+    });
 
     return new Promise((resolve, reject) => {
       jestCli.runCLI({watch, config}, [process.cwd()], result => {

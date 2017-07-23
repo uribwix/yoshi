@@ -224,6 +224,27 @@ describe('Aggregator: Test', () => {
       expect(res.code).to.equal(0);
       expect(res.stderr).to.contain('1 passed');
     });
+
+    it('should transpile ES modules out of the box', () => {
+      const res = test
+        .setup({
+          '__tests__/foo.js': `
+            import a from '../a';
+            describe('Foo', () => {
+              it('should return value', () => {
+                expect(a).toBe(1);
+              });
+            });
+          `,
+          'a.js': `
+            export default 1;
+          `,
+          'package.json': fx.packageJson()
+        })
+        .execute('test', ['--jest']);
+      expect(res.code).to.equal(0);
+      expect(res.stderr).to.contain('1 passed');
+    });
   });
 
   describe('--mocha', () => {
