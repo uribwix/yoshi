@@ -46,15 +46,17 @@ function ensureDir(dir) {
     mkdirp(dir, err => err ? reject(err) : resolve(dir)));
 }
 
-module.exports = ({log, watch, base}) => {
+module.exports = ({log, watch, base, projectConfig}) => {
   function copyAssets({output = 'statics'} = {}) {
     const assets = `${base()}/assets/**/*`;
     const htmlAssets = `${base()}/**/*.{ejs,html,vm}`;
     const serverAssets = `${base()}/**/*.{css,json,d.ts}`;
+    const copyEsVersion = projectConfig.isEsModule() && !watch;
 
     const copyAllAssets = () => Promise.all([
       copyFiles([assets, htmlAssets, serverAssets]),
-      copyFiles([assets, htmlAssets], output, path.join(process.cwd(), 'src'))
+      copyFiles([assets, htmlAssets], output, path.join(process.cwd(), 'src')),
+      copyEsVersion ? copyFiles([assets, htmlAssets, serverAssets], 'es') : Promise.resolve()
     ]);
 
     if (watch) {

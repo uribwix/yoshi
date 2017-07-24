@@ -2,7 +2,8 @@
 
 const {expect} = require('chai');
 const tp = require('test-phases');
-const clean = require('../index');
+const copy = require('../index');
+const path = require('path');
 
 describe('Copy', () => {
   let test;
@@ -11,7 +12,11 @@ describe('Copy', () => {
   beforeEach(() => {
     test = tp.create();
     process.chdir(test.tmp);
-    task = clean({log: a => a, base: () => 'src'});
+    task = copy({
+      log: a => a,
+      base: () => 'src',
+      projectConfig: {isEsModule: () => false}
+    });
   });
   afterEach(() => test.teardown());
 
@@ -56,49 +61,144 @@ describe('Copy', () => {
   });
 
   it('should copy files from assets folder into the output dir if specified', () => {
-    test.setup({
-      'src/assets/some-file': 'a'
-    });
+    createFilesInAssetsDirectory();
 
     return task({output: 'statics1'})
       .then(() => {
-        expect(test.list('dist/statics1/assets')).to.include('some-file');
+        checkAssetsDirectoryCopiedTo('dist/statics1');
       });
   });
 
   it('should copy html assets to dist and to statics', () => {
+    createHtmlAssets();
+
+    return task()
+      .then(() => {
+        checkHtmlAssetsCopiedTo('dist/statics');
+        checkHtmlAssetsCopiedTo('dist/src');
+      });
+  });
+
+  it('should copy server assets to dist', () => {
+    createServerAssets();
+
+    return task()
+      .then(() => {
+        checkServerAssetsCopiedTo('dist/src');
+      });
+  });
+
+  describe('when module should emit es version', () => {
+    let extendTask;
+
+    beforeEach(() => {
+      extendTask = ({watch}) => copy({
+        log: a => a,
+        base: () => 'src',
+        projectConfig: {isEsModule: () => true},
+        watch
+      });
+
+      createFilesInAssetsDirectory();
+      createHtmlAssets();
+      createServerAssets();
+    });
+
+    describe('but in watch mode', () => {
+      beforeEach(() => task = extendTask({watch: true}));
+
+      it('should not copy assets to dist/es', () => {
+        return task()
+          .then(() => {
+            expect(test.contains('dist/es')).to.be.false;
+          });
+      });
+    });
+
+    describe('and not in watch mode', () => {
+      beforeEach(() => task = extendTask({watch: false}));
+
+      it('should copy assets to dist/es', () => {
+        return task()
+          .then(() => {
+            checkAssetsDirectoryCopiedTo('dist/es/src');
+            checkServerAssetsCopiedTo('dist/es/src');
+            checkHtmlAssetsCopiedTo('dist/es/src');
+          });
+      });
+    });
+  });
+
+  describe('when in watch mode', () => {
+    let extendTask;
+
+    beforeEach(() => {
+      extendTask = ({es}) => copy({
+        log: a => a,
+        base: () => 'src',
+        projectConfig: {isEsModule: () => es},
+        watch: true
+      });
+
+      createFilesInAssetsDirectory();
+      createHtmlAssets();
+      createServerAssets();
+    });
+
+    describe('but module should not emit es version', () => {
+      beforeEach(() => task = extendTask({es: true}));
+
+      it('should not copy assets to dist/es', () => {
+        return task()
+          .then(() => {
+            expect(test.contains('dist/es')).to.be.false;
+          });
+      });
+    });
+  });
+
+  function createFilesInAssetsDirectory() {
+    test.setup({
+      'src/assets/some-file': 'a'
+    });
+  }
+
+  function createHtmlAssets() {
     test.setup({
       'src/index.html': 'a',
       'src/index.vm': 'a',
       'src/index.ejs': 'a'
     });
+  }
 
-    return task()
-      .then(() => {
-        expect(test.list('dist/statics')).to.include('index.html');
-        expect(test.list('dist/statics')).to.include('index.vm');
-        expect(test.list('dist/statics')).to.include('index.ejs');
-
-        expect(test.list('dist/src')).to.include('index.html');
-        expect(test.list('dist/src')).to.include('index.vm');
-        expect(test.list('dist/src')).to.include('index.ejs');
-      });
-  });
-
-  it('should copy server assets to dist', () => {
+  function createServerAssets() {
     test.setup({
       'src/style.css': '.a {\ncolor: red;\n}\n',
       'src/some.d.ts': '',
-      'src/file.json': '{}',
+      'src/file.json': '{}'
     });
+  }
 
-    return task()
-      .then(() => {
-        expect(test.list('dist/src')).to.include.members([
-          'style.css',
-          'file.json',
-          'some.d.ts'
-        ]);
-      });
-  });
+  function checkAssetsDirectoryCopiedTo(to) {
+    const assets = path.join(to, 'assets');
+    expect(test.list(assets)).to.include.members([
+      'some-file'
+    ]);
+  }
+
+  function checkServerAssetsCopiedTo(to) {
+    expect(test.list(to)).to.include.members([
+      'style.css',
+      'file.json',
+      'some.d.ts'
+    ]);
+  }
+
+  function checkHtmlAssetsCopiedTo(to) {
+    expect(test.list(to)).to.include.members([
+      'index.html',
+      'index.vm',
+      'index.ejs'
+    ]);
+  }
 });
