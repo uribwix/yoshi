@@ -1,8 +1,15 @@
 const {isProduction, isCI} = require('yoshi-utils');
 const genericNames = require('generic-names');
 
+const patterns = module.exports.patterns = {
+  long: '[path][name]__[local]__[hash:base64:5]',
+  short: '[hash:base64:5]'
+};
+
+const isLongCSSFT = process.env.LONG_CSS_PATTERN === 'true';
+
 const cssModulesPattren = module.exports.cssModulesPattren = () =>
-  (isProduction() || isCI()) ? `[hash:base64:5]` : `[path][name]__[local]__[hash:base64:5]`;
+  ((isProduction() || isCI()) && !isLongCSSFT) ? patterns.short : patterns.long;
 
 module.exports.wixCssModulesRequireHook = (rootDir = './dist/src') => {
   require('css-modules-require-hook')({

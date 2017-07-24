@@ -1,7 +1,9 @@
 const {expect} = require('chai');
 const {cleanMocks, mockEnvironment, mockCI} = require('yoshi-utils').utilsTestkit;
 const {create} = require('test-phases');
-const {cssModulesPattren} = require('../index');
+const {cssModulesPattren, patterns} = require('../index');
+
+const {short: shortPattern, long: longPattern} = patterns;
 
 describe('CSS modules pattern', () => {
 
@@ -10,24 +12,24 @@ describe('CSS modules pattern', () => {
   it('should return short pattern for production mode', () => {
     mockEnvironment({production: true});
     mockCI({ci: false});
-    expect(cssModulesPattren()).to.equal(`[hash:base64:5]`);
+    expect(cssModulesPattren()).to.equal(shortPattern);
   });
 
   it('should return long pattern for local mode', () => {
     mockEnvironment({production: false});
     mockCI({ci: false});
-    expect(cssModulesPattren()).to.equal(`[path][name]__[local]__[hash:base64:5]`);
+    expect(cssModulesPattren()).to.equal(longPattern);
   });
 
   it('should return short pattern in CI', () => {
     mockEnvironment({production: false});
     mockCI({ci: true});
-    expect(cssModulesPattren()).to.equal(`[hash:base64:5]`);
+    expect(cssModulesPattren()).to.equal(shortPattern);
   });
 });
 
 describe('CSS modules runtime', () => {
-  const generateCssModulesPattern = (name, path, pattern = `[hash:base64:5]`) => {
+  const generateCssModulesPattern = (name, path, pattern = shortPattern) => {
     const genericNames = require('generic-names');
     const generate = genericNames(pattern);
     return generate(name, path);
@@ -98,5 +100,28 @@ describe('CSS modules runtime', () => {
     expect(res.code).to.equal(0);
     expect(res.stdout).to.equal(expectedCssMap);
     myTest.teardown();
+  });
+
+  describe('Long CSS pattern FT', () => {
+    it('should generate css modules with long pattern when toggled', () => {
+      mockEnvironment({production: true});
+      const hash = generateCssModulesPattern('a', 'styles/my-file.css', longPattern);
+      const expectedCssMap = `{ a: '${hash}' }\n`;
+      const myTest = create('dist/src/index');
+      const res = myTest
+        .setup({
+          'dist/src/index.js': `const {wixCssModulesRequireHook} = require('${require.resolve('../index')}');
+          wixCssModulesRequireHook('./dist/src');
+          const s = require('./styles/my-file.css')
+          console.log(s);
+        `,
+          'dist/src/styles/my-file.css': `.a {color: red;}`
+        })
+      .execute('', [], {NODE_ENV: 'production', LONG_CSS_PATTERN: true});
+
+      expect(res.code).to.equal(0);
+      expect(res.stdout).to.equal(expectedCssMap);
+      myTest.teardown();
+    });
   });
 });
