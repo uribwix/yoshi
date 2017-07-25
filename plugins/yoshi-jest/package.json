@@ -12,11 +12,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "babel-jest": "^20.0.3",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
+    "babel-jest": "~20.0.3",
+    "babel-plugin-transform-es2015-modules-commonjs": "~6.24.1",
     "jest-cli": "~20.0.4",
     "jest-teamcity-reporter": "~0.6.2",
-    "lodash.merge": "^4.6.0"
+    "lodash.merge": "~4.6.0"
   },
   "devDependencies": {
     "chai": "~3.5.0",
