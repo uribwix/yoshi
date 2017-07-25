@@ -1,6 +1,7 @@
 'use strict';
 
 const gulp = require('gulp');
+const path = require('path');
 const Jasmine = require('jasmine');
 const {TerminalReporter, TeamCityReporter} = require('jasmine-reporters');
 const projectConfig = require('../../config/project');
@@ -23,7 +24,16 @@ function runJasmine() {
     }
 
     jasm.onComplete(passed => passed ? resolve() : reject());
-    jasm.execute([].concat(files));
+    jasm.loadConfig({
+      spec_dir: '', //eslint-disable-line camelcase
+      spec_files: [ //eslint-disable-line camelcase
+        files
+      ],
+      helpers: [
+        path.join(__dirname, '..', '..', 'config', 'test-setup.js')
+      ]
+    });
+    jasm.execute();
   });
 }
 

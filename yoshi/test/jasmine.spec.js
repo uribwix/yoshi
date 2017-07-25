@@ -86,6 +86,16 @@ describe('test --jasmine', () => {
 
     expect(res.code).to.equal(0);
   });
+
+  it('should load helpers', () => {
+    const res = test
+      .setup(passingProjectWithHelper())
+      .execute('test', ['--jasmine']);
+
+    expect(res.code).to.equal(0);
+    expect(res.stdout).to.contain('1 spec, 0 failures');
+    expect(res.stdout).to.contain('a helper file was loaded');
+  });
 });
 
 function passingProject() {
@@ -102,12 +112,27 @@ function failingProject() {
   };
 }
 
+function passingProjectWithHelper() {
+  return {
+    'test/some.spec.js': passingTestWithHelper(),
+    'test/setup.js': jasmineSetup(),
+    'package.json': fx.packageJson()
+  };
+}
+
 function passingTest() {
-  return `it('should pass', function () { expect(1).toBe(1); });`;
+  return `it('should pass', () => expect(1).toBe(1));`;
 }
 
 function failingTest() {
   return `it('should fail', () => expect(1).toBe(2));`;
+}
+
+function passingTestWithHelper() {
+  return `it('should pass if helper called', function () {expect(this.helperLoaded).toBe(true)})`;
+}
+function jasmineSetup() {
+  return 'console.log(\'a helper file was loaded\'); beforeEach(function() {this.helperLoaded = true})';
 }
 
 function checkStdoutContains(test, str) {

@@ -164,6 +164,11 @@ yoshi: {
 * Karma tests setup:
 
   When running tests using Karma, make sure you have the right configurations in your `package.json` as described in [`yoshi.specs`](#wixspecs) section. In addition, if you have a `karma.conf.js` file, the configurations will be merged with our [built-in configurations](config/karma.conf.js).
+* Jasmine tests setup:
+
+  Specifying a custom glob for test files is possible by configuring `package.json` as described in [`yoshi.specs`](#wixspecs). The default glob matches `.spec.` files in all folders.
+  <br />
+  If you wish to load helpers, import them all in a file placed at `'test/setup.js'`.
 
 ### lint
 
