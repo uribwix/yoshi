@@ -4,7 +4,7 @@ module.exports = function (wallaby) {
   wallabyCommon.setup = () => {
     wallaby.testFramework.configure(require('./package.json').jest);
     process.env.IN_WALLABY = true;
-    require('yoshi/config/setup');
+    require('yoshi/config/test-setup');
   };
   return wallabyCommon;
 };

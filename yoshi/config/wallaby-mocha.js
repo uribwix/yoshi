@@ -6,7 +6,7 @@ module.exports = function (wallaby) {
     const mocha = wallaby.testFramework;
     mocha.timeout(30000);
     process.env.IN_WALLABY = true;
-    require('yoshi/config/setup');
+    require('yoshi/config/test-setup');
   };
   return wallabyCommon;
 };
