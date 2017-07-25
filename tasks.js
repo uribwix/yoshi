@@ -34,10 +34,10 @@ module.exports.bootstrap = () => start(
   startModulesTasks.modules.load(),
   startModulesTasks.modules.removeUnchanged('bootstrap'),
   startModulesTasks.iter.forEach()((module, input, asyncReporter) => Start(asyncReporter)(
+    startModulesTasks.module.exec(module)('yarn --no-lockfile && yarn link'),
     startTasks.ifTrue(module.dependencies.length > 0)(() =>
       Start(asyncReporter)(startModulesTasks.module.exec(module)(`yarn link ${module.dependencies.map(item => item.name).join(' ')}`))
     ),
-    startModulesTasks.module.exec(module)('yarn --no-lockfile && yarn link'),
     startModulesTasks.module.exec(module)('yarn run build'),
     startModulesTasks.module.markBuilt(module, 'bootstrap')
   ))
