@@ -605,7 +605,7 @@ describe('Aggregator: Build', () => {
 
     const generateCssModulesPattern = (name, path, pattern = `[hash:base64:5]`) => {
       const genericNames = require('generic-names');
-      const generate = genericNames(pattern);
+      const generate = genericNames(pattern, {hashPrefix: 'a'});
       return generate(name, path);
     };
 

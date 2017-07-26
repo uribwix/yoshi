@@ -9,6 +9,7 @@ const projectConfig = require('./project');
 const DynamicPublicPath = require('../lib/plugins/dynamic-public-path');
 
 const config = ({debug, separateCss = projectConfig.separateCss()} = {}) => {
+  const projectName = projectConfig.name();
   const cssModules = projectConfig.cssModules();
   const tpaStyle = projectConfig.tpaStyle();
 
@@ -17,8 +18,8 @@ const config = ({debug, separateCss = projectConfig.separateCss()} = {}) => {
 
     module: {
       rules: [
-        ...require('../lib/loaders/sass')(separateCss, cssModules, tpaStyle).client,
-        ...require('../lib/loaders/less')(separateCss, cssModules, tpaStyle).client
+        ...require('../lib/loaders/sass')(separateCss, cssModules, tpaStyle, projectName).client,
+        ...require('../lib/loaders/less')(separateCss, cssModules, tpaStyle, projectName).client
       ]
     },
 
