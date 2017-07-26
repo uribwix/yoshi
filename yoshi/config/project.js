@@ -16,7 +16,6 @@ const allSourcesButExternalModules = function (filePath) {
 };
 
 module.exports = {
-  name: () => packagejson.name,
   specs: {
     node: () => getConfig('specs.node'),
     browser: () => getConfig('specs.browser')
