@@ -21,7 +21,7 @@ function renderLess(fileContent, options) {
   );
 }
 
-function renderFile(file) {
+function renderFile(file, outputDirs) {
   const options = {
     paths: ['.', 'node_modules', path.dirname(file)],
     filename: path.basename(file),
@@ -35,14 +35,21 @@ function renderFile(file) {
     .replace(/(^@import.*)(~)/gm, '$1');
 
   return renderLess(fileContent, options)
-    .then(result => writeFileIntoDir(path.resolve('dist', file), result.css))
-    .catch(err => {
+    .then(result => Promise.all(
+      outputDirs.map(dir => writeFileIntoDir(path.resolve(dir, file), result.css))
+    )).catch(err => {
       throw `[${err.filename}] ${err.message}`;
     });
 }
 
-module.exports = ({logIf, watch, base}) => {
+module.exports = ({logIf, watch, base, projectConfig}) => {
   const pattern = `${base()}/**/*.less`;
+
+  const outputDirs = ['dist'];
+
+  if (projectConfig.isEsModule() && !watch) {
+    outputDirs.push('dist/es');
+  }
 
   function less() {
     if (watch) {
@@ -53,7 +60,7 @@ module.exports = ({logIf, watch, base}) => {
   }
 
   function transpile() {
-    return Promise.all(readDir(pattern).map(renderFile));
+    return Promise.all(readDir(pattern).map(file => renderFile(file, outputDirs)));
   }
 
   return logIf(less, () => readDir(pattern).length > 0);
