@@ -2,7 +2,6 @@
 
 const chalk = require('chalk');
 const spawn = require('cross-spawn');
-const flowRight = require('lodash.flowright');
 const toPairs = require('lodash.topairs');
 
 const noop = () => {};
@@ -61,11 +60,13 @@ module.exports = ({log, watch}) => {
     const child = spawn(bin, [...args, ...watch ? ['--watch'] : []]);
 
     return new Promise((resolve, reject) => {
-      child.stdout.on('data', onStdout(flowRight(resolve, done), reject));
-
-      if (!watch) {
-        child.on('exit', code => code === 0 ? resolve() : reject());
+      if (watch) {
+        child.stdout.on('data', onStdout(done));
+        return resolve();
       }
+
+      child.stdout.on('data', onStdout(noop, reject));
+      child.on('exit', code => code === 0 ? resolve() : reject());
     });
   }
 

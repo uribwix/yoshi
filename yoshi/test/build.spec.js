@@ -515,12 +515,13 @@ describe('Aggregator: Build', () => {
       expect(test.list('dist/statics')).not.to.contain('app.bundle.js');
     });
 
-    it('should exit with code 1 without a custom entry and default entry not existing', () => {
+    it('should exit with code 0 and not create bundle.js when there is no custom entry configures and default entry does not exist', () => {
       const res = test
         .setup({
-          'tsconfig.json': fx.tsconfig(),
+          'tsconfig.json': fx.tsconfig({files: ['src/example.ts']}),
           'package.json': fx.packageJson(),
-          'pom.xml': fx.pom()
+          'pom.xml': fx.pom(),
+          'src/example.ts': `console.log('horrey')`,
         })
         .execute('build');
 
