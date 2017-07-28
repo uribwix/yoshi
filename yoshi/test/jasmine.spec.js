@@ -72,7 +72,7 @@ describe('test --jasmine', () => {
 
     return checkStdoutContains(test, '1 spec, 1 failure')
       .then(() => test.modify('test/a.spec.js', passingTest()))
-      .then(() => checkStdoutContains(test, '1 spec, 0 failures'));
+      .then(() => checkStdoutContains(test, '2 specs, 1 failure'));
   });
 
   it('should run tests in typescript', () => {

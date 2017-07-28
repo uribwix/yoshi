@@ -33,8 +33,29 @@ function runJasmine() {
         path.join(__dirname, '..', '..', 'config', 'test-setup.js')
       ]
     });
+    clearCaches(jasm.helperFiles);
+    clearCaches(jasm.specFiles);
     jasm.execute();
   });
+}
+
+function clearCaches(files) {
+  if (files) {
+    files.forEach(file => deleteRequireCache(require.resolve(path.resolve(file))));
+  }
+}
+
+function deleteRequireCache(id) {
+  if (!id || id.includes('node_modules')) {
+    return;
+  }
+
+  const files = require.cache[id];
+
+  if (files !== undefined) {
+    Object.keys(files.children).forEach(file => deleteRequireCache(files.children[file].id));
+    delete require.cache[id];
+  }
 }
 
 module.exports = ({log, watch}) => {
