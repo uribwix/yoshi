@@ -10,10 +10,11 @@ const {inTeamCity} = require('../utils');
 const files = projectConfig.specs.node() || globs.specs();
 
 const mochaBin = path.join('mocha', 'bin', 'mocha');
-const env = Object.assign(process.env, {NODE_ENV: 'test', SRC_PATH: './src'});
+const baseEnv = {mocha_reporter: inTeamCity() ? '' : 'progress'}; //eslint-disable-line camelcase
+const env = Object.assign(baseEnv, process.env, {NODE_ENV: 'test', SRC_PATH: './src'});
 const options = {cwd: process.cwd(), env, stdio: 'inherit'};
 const args = {
-  reporter: inTeamCity() ? 'mocha-teamcity-reporter' : 'progress',
+  reporter: 'mocha-env-reporter',
   timeout: 30000,
   recursive: true,
   require: [absolute('..', '..', 'config', 'test-setup')]

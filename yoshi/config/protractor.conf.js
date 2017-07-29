@@ -86,7 +86,7 @@ const merged = ld.mergeWith({
 }, userConf, a => typeof a === 'function' ? a : undefined);
 
 if (merged.framework === 'mocha') {
-  merged.mochaOpts.reporter = inTeamCity() ? 'mocha-teamcity-reporter' : 'mocha-env-reporter';
+  merged.mochaOpts.reporter = 'mocha-env-reporter';
 }
 
 function normaliseSpecs(config) {

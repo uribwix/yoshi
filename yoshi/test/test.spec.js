@@ -44,7 +44,7 @@ describe('Aggregator: Test', () => {
             });
           `,
           'package.json': fx.packageJson()
-        }, [tmp => hooks.installDependency(tmp)('babel-register')])
+        })
         .execute('test');
 
       expect(res.code).to.equal(0);
@@ -255,7 +255,7 @@ describe('Aggregator: Test', () => {
         .setup({
           'test/some.spec.js': `it.only("pass", () => 1);`,
           'package.json': fx.packageJson()
-        }, [tmp => hooks.installDependency(tmp)('babel-register')])
+        })
         .execute('test', ['--mocha']);
 
       expect(res.code).to.equal(0);
@@ -277,7 +277,7 @@ describe('Aggregator: Test', () => {
             it("pass with default", () => assert.equal(cssWithDefault.hello, 'hello'));
           `,
           'package.json': fx.packageJson()
-        }, [tmp => hooks.installDependency(tmp)('babel-register')])
+        })
         .execute('test', ['--mocha']);
 
       expect(res.code).to.equal(0);
@@ -314,7 +314,7 @@ describe('Aggregator: Test', () => {
         .setup({
           'test/some.spec.js': `it("fail", () => { throw new Error() });`,
           'package.json': fx.packageJson()
-        }, [tmp => hooks.installDependency(tmp)('babel-register')])
+        })
         .execute('test', ['--mocha']);
 
       expect(res.code).to.be.above(0);
@@ -330,7 +330,7 @@ describe('Aggregator: Test', () => {
               node: 'some/*.glob.js'
             }
           })
-        }, [tmp => hooks.installDependency(tmp)('babel-register')])
+        })
         .execute('test', ['--mocha']);
 
       expect(res.code).to.equal(0);
@@ -344,7 +344,7 @@ describe('Aggregator: Test', () => {
           'app/bla/comp.spec.js': `it("pass", () => 1);`,
           'src/bla/comp.spec.js': `it("pass", () => 1);`,
           'package.json': fx.packageJson()
-        }, [tmp => hooks.installDependency(tmp)('babel-register')])
+        })
         .execute('test', ['--mocha']);
 
       expect(res.code).to.equal(0);
@@ -362,7 +362,7 @@ describe('Aggregator: Test', () => {
               node: 'dist/**/*.spec.js'
             }
           })
-        }, [tmp => hooks.installDependency(tmp)('babel-register')])
+        })
         .execute('test', ['--mocha']);
 
       expect(res.code).to.equal(0);
@@ -374,12 +374,40 @@ describe('Aggregator: Test', () => {
         .setup({
           'test/some.spec.js': `it.only("pass", () => 1);`,
           'package.json': fx.packageJson()
-        }, [tmp => hooks.installDependency(tmp)('babel-register')])
+        })
         .execute('test', ['--mocha'], insideTeamCity);
 
       console.log(res.stdout);
       expect(res.code).to.equal(0);
       expect(res.stdout).to.contain('##teamcity[');
+    });
+
+    it('should use the right reporter when running outside TeamCity', () => {
+      const res = test
+        .setup({
+          'test/some.spec.js': `it.only("pass", () => 1);`,
+          'package.json': fx.packageJson()
+        })
+        .execute('test', ['--mocha'], outsideTeamCity);
+
+      console.log(res.stdout);
+      expect(res.code).to.equal(0);
+      expect(res.stdout).to.contain('▬▬▬▬▬▬▬▬▬▬▬▬▬');
+    });
+
+    it('should use a custom reporter when requested', () => {
+      const res = test
+        .setup({
+          'test/some.spec.js': `it.only("pass", () => 1);`,
+          'package.json': fx.packageJson()
+        })
+        .execute('test', ['--mocha'], Object.assign({
+          mocha_reporter: 'landing' //eslint-disable-line camelcase
+        }, outsideTeamCity));
+
+      console.log(res.stdout);
+      expect(res.code).to.equal(0);
+      expect(res.stdout).to.contain('✈');
     });
 
     describe('with babel-register', () => {
