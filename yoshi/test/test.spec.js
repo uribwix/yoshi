@@ -127,7 +127,7 @@ describe('Aggregator: Test', () => {
           'package.json': fx.packageJson()
         })
         .execute('test', ['--jest']);
-      console.log(res);
+
       expect(res.code).to.equal(0);
       expect(res.stderr).to.contain('1 passed');
     });
@@ -152,7 +152,7 @@ describe('Aggregator: Test', () => {
           'package.json': fx.packageJson()
         })
         .execute('test', ['--jest']);
-      console.log(res);
+
       expect(res.code).to.equal(1);
       expect(res.stderr).to.contain('1 failed');
     });
@@ -182,7 +182,7 @@ describe('Aggregator: Test', () => {
           }`
         }, [hooks.installDependencies])
         .execute('test', ['--jest'], insideTeamCity);
-      console.log(res);
+
       expect(res.code).to.equal(0);
       expect(res.stdout).to.contain('##teamcity[');
     });
@@ -220,7 +220,7 @@ describe('Aggregator: Test', () => {
           }`
         }, [hooks.installDependencies])
         .execute('test', ['--jest']);
-      console.log(res);
+
       expect(res.code).to.equal(0);
       expect(res.stderr).to.contain('1 passed');
     });
@@ -377,7 +377,6 @@ describe('Aggregator: Test', () => {
         })
         .execute('test', ['--mocha'], insideTeamCity);
 
-      console.log(res.stdout);
       expect(res.code).to.equal(0);
       expect(res.stdout).to.contain('##teamcity[');
     });
@@ -390,7 +389,6 @@ describe('Aggregator: Test', () => {
         })
         .execute('test', ['--mocha'], outsideTeamCity);
 
-      console.log(res.stdout);
       expect(res.code).to.equal(0);
       expect(res.stdout).to.contain('▬▬▬▬▬▬▬▬▬▬▬▬▬');
     });
@@ -405,7 +403,6 @@ describe('Aggregator: Test', () => {
           mocha_reporter: 'landing' //eslint-disable-line camelcase
         }, outsideTeamCity));
 
-      console.log(res.stdout);
       expect(res.code).to.equal(0);
       expect(res.stdout).to.contain('✈');
     });
