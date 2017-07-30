@@ -154,4 +154,26 @@ describe('Webpack basic configs', () => {
       expect(test.content('dist/statics/app.bundle.js')).to.contain('"0.0.0"');
     });
   });
+
+  describe('Module concatenation plugin', () => {
+    beforeEach(() => {
+      test.setup({
+        'src/client.js': `import dep from './dep.js'`,
+        'src/dep.js': 'export default function dep() { return 1 }',
+        'package.json': fx.packageJson()
+      });
+    });
+
+    it('should be enabled by default', () => {
+      test.execute('build', [], {});
+      expect(test.content('./dist/statics/app.bundle.js')).to.contain('// CONCATENATED MODULE: ./dep.js');
+    });
+
+    it('should be disabled when DISABLE_MODULE_CONCATENATION is set', () => {
+      test.execute('build', [], {
+        DISABLE_MODULE_CONCATENATION: 'true'
+      });
+      expect(test.content('./dist/statics/app.bundle.js')).to.not.contain('// CONCATENATED MODULE: ./dep.js');
+    });
+  });
 });
