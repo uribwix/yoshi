@@ -59,22 +59,7 @@ describe('Aggregator: Test', () => {
         if protractor.conf is present, according to dist/test/**/*.e2e.js glob`, () => {
       const res = test
         .setup({
-          'protractor.conf.js': `
-            const http = require("http");
-
-            exports.config = {
-              framework: "jasmine",
-              specs: ["dist/test/**/*.e2e.js"],
-              onPrepare: () => {
-                const server = http.createServer((req, res) => {
-                  const response = "<html><body><script src=http://localhost:3200/app.bundle.js></script></body></html>";
-                  res.end(response);
-                });
-
-                return server.listen(1337);
-              }
-            };
-          `,
+          'protractor.conf.js': fx.protractorConf({cdnPort: 3200}),
           'dist/test/some.e2e.js': `
             it("should write to body", () => {
               browser.ignoreSynchronization = true;
@@ -91,6 +76,48 @@ describe('Aggregator: Test', () => {
       expect(res.stdout).to.contains('protractor');
       // note: we've setup a real integration, keep it in order
       // to see the full integration between server and client.
+      expect(res.stdout).to.contain('1 spec, 0 failures');
+    });
+
+    it(`should use protractor-browser-logs and fail if there are any console errors on the browser`, () => {
+      const res = test
+        .setup({
+          'protractor.conf.js': fx.protractorConf({cdnPort: 3200}),
+          'dist/test/some.e2e.js': `
+            it("should fail", () => {
+              browser.ignoreSynchronization = true;
+              browser.get("http://localhost:1337");
+            });
+          `,
+          'node_modules/client/dist/app.bundle.js': `console.error('some-error')`,
+          'package.json': fx.packageJson({clientProjectName: 'client'})
+        })
+        .execute('test', ['--protractor'], {PROTRACTOR_BROWSER_LOGS: 'true'});
+
+      expect(res.code).to.equal(1);
+      expect(res.stdout).to.contains('UNEXPECTED MESSAGE');
+      expect(res.stdout).to.contain('1 spec, 1 failure');
+    });
+
+    it(`should not use protractor-browser-logs when FT is off`, () => {
+      const res = test
+        .setup({
+          'protractor.conf.js': fx.protractorConf({cdnPort: 3200}),
+          'dist/test/some.e2e.js': `
+            it("should fail", () => {
+              browser.ignoreSynchronization = true;
+              browser.get("http://localhost:1337");
+            });
+          `,
+          'node_modules/client/dist/app.bundle.js': `console.error('some-error')`,
+          'package.json': fx.packageJson({clientProjectName: 'client'})
+        })
+        .execute('test', ['--protractor'], {PROTRACTOR_BROWSER_LOGS: 'false'});
+
+      // Test should not fail although the `console.error`
+
+      expect(res.code).to.equal(0);
+      expect(res.stdout).to.contains('protractor');
       expect(res.stdout).to.contain('1 spec, 0 failures');
     });
 

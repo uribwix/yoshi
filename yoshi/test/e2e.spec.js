@@ -213,7 +213,7 @@ describe('Aggregator: e2e', () => {
 
   function singleModuleWithMocha() {
     return {
-      'protractor.conf.js': fx.protractorConf('mocha'),
+      'protractor.conf.js': fx.protractorConf({framework: 'mocha'}),
       'dist/test/some.e2e.js': fx.e2eTestMocha(),
       'dist/statics/app.bundle.js': fx.e2eClient(),
       'package.json': fx.packageJson(

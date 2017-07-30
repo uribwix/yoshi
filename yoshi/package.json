@@ -70,6 +70,7 @@
     "phantomjs-polyfill": "~0.0.2",
     "postcss-loader": "~2.0.6",
     "protractor": "~5.1.2",
+    "protractor-browser-logs": "~1.0.351",
     "raw-loader": "~0.5.1",
     "sass-loader": "~6.0.6",
     "screenshot-reporter": "~1.1.3",

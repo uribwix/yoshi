@@ -27,6 +27,8 @@ const globs = require('../lib/globs');
 const userConfPath = path.resolve('protractor.conf.js');
 const userConf = exists(userConfPath) ? require(userConfPath).config : null;
 
+const shouldUseProtractorBrowserLogs = process.env.PROTRACTOR_BROWSER_LOGS === 'true';
+
 const beforeLaunch = (userConf && userConf.beforeLaunch) || ld.noop;
 const onPrepare = (userConf && userConf.onPrepare) || ld.noop;
 const afterLaunch = (userConf && userConf.afterLaunch) || ld.noop;
@@ -62,6 +64,10 @@ const merged = ld.mergeWith({
     });
   },
   onPrepare: () => {
+    if (shouldUseProtractorBrowserLogs) {
+      setupProtractorLogs();
+    }
+
     if (merged.framework === 'jasmine' && inTeamCity()) {
       const TeamCityReporter = require('jasmine-reporters').TeamCityReporter;
       jasmine.getEnv().addReporter(new TeamCityReporter());
@@ -92,6 +98,24 @@ if (merged.framework === 'mocha') {
 function normaliseSpecs(config) {
   const specs = [].concat(config.specs || []);
   return Object.assign({}, config, {specs: specs.map(spec => path.resolve(spec))});
+}
+
+function setupProtractorLogs() {
+  const browserLogs = require('protractor-browser-logs');
+  const logs = global.logs = browserLogs(browser);
+
+  beforeEach(() => {
+    logs.reset();
+
+    logs.ignore(logs.DEBUG);
+    logs.ignore(logs.INFO);
+    logs.ignore(logs.LOG);
+
+    logs.ignore('favicon.ico');
+    logs.ignore('cast_sender.js');
+  });
+
+  afterEach(logs.verify);
 }
 
 module.exports.config = normaliseSpecs(merged);
