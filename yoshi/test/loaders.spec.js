@@ -352,70 +352,112 @@ describe('Loaders', () => {
         })
         .execute('build');
 
-      expect(test.content('dist/statics/app.bundle.js')).to.contain('data:image/png;base64,c29tZS1jb250ZW50Cg==');
+      expect(test.content('dist/statics/app.bundle.js'))
+        .to.contain('data:image/png;base64,c29tZS1jb250ZW50Cg==');
     });
 
     it('should write a separate image above 10kb', () => {
       test
         .setup({
-          'src/client.js': `require('./large-image.png');`,
-          'src/large-image.png': _.repeat('a', 10001)})
+          'src/client.js': `require('./largeImage.png');`,
+          'src/largeImage.png': createAboveTheLimitFile()
+        })
         .execute('build');
 
-      expect(test.content('dist/statics/app.bundle.js')).to.match(/"large-image.png\?\w+"/);
+      expect(test.content('dist/statics/app.bundle.js'))
+        .to.contain(fileAboveTheLimit('largeImage.png'));
+    });
+
+    it('should load images', () => {
+      test
+        .setup({
+          'src/client.js': `
+            require('./img.png');
+            require('./img.jpg');
+            require('./img.jpeg');
+            require('./img.gif');
+          `,
+          'src/img.png': createAboveTheLimitFile(),
+          'src/img.jpg': createAboveTheLimitFile(),
+          'src/img.jpeg': createAboveTheLimitFile(),
+          'src/img.gif': createAboveTheLimitFile()
+        })
+        .execute('build');
+
+      const content = test.content('dist/statics/app.bundle.js');
+      expect(content).to.contain(fileAboveTheLimit('img.png'));
+      expect(content).to.contain(fileAboveTheLimit('img.jpg'));
+      expect(content).to.contain(fileAboveTheLimit('img.jpeg'));
+      expect(content).to.contain(fileAboveTheLimit('img.gif'));
     });
 
     it('should load fonts', () => {
       test
         .setup({
-          'src/client.js': `require('./font.ttf');
+          'src/client.js': `
+            require('./font.ttf');
             require('./font.woff');
             require('./font.woff2');
-            require('./font.eot');`,
-          'src/font.ttf': _.repeat('a', 10001),
-          'src/font.woff': _.repeat('a', 10001),
-          'src/font.woff2': _.repeat('a', 10001),
-          'src/font.eot': _.repeat('a', 10001),
+            require('./font.eot');
+          `,
+          'src/font.ttf': createAboveTheLimitFile(),
+          'src/font.woff': createAboveTheLimitFile(),
+          'src/font.woff2': createAboveTheLimitFile(),
+          'src/font.eot': createAboveTheLimitFile()
         })
         .execute('build');
 
       const content = test.content('dist/statics/app.bundle.js');
-
-      expect(content).to.match(/"font\.ttf\?\w+"/);
-      expect(content).to.match(/"font\.woff\?\w+"/);
-      expect(content).to.match(/"font\.woff2\?\w+"/);
-      expect(content).to.match(/"font\.eot\?\w+"/);
+      expect(content).to.contain(fileAboveTheLimit('font.ttf'));
+      expect(content).to.contain(fileAboveTheLimit('font.woff'));
+      expect(content).to.contain(fileAboveTheLimit('font.woff2'));
+      expect(content).to.contain(fileAboveTheLimit('font.eot'));
     });
 
     it('should load wav files', () => {
       test
         .setup({
           'src/client.js': `require('./beep.wav');`,
-          'src/beep.wav': _.repeat('a', 10001),
+          'src/beep.wav': createAboveTheLimitFile(),
         })
         .execute('build');
 
       const content = test.content('dist/statics/app.bundle.js');
-
-      expect(content).to.match(/"beep\.wav\?\w+"/);
+      expect(content).to.contain(fileAboveTheLimit('beep.wav'));
     });
 
-    it('should load files that have a path with query string ', () => {
+    it('should load files that have a path with query string', () => {
       test
         .setup({
-          'src/client.js': `require('./font.ttf?version=1.0.0');
-            require('./image.svg?version=1.0.2&some-other-param=value');`,
-          'src/font.ttf': _.repeat('a', 10001),
-          'src/image.svg': _.repeat('a', 10001)
+          'src/client.js': `require('./image.svg?version=1.0.2&some-other-param=value');`,
+          'src/image.svg': createAboveTheLimitFile()
         })
         .execute('build');
 
       const content = test.content('dist/statics/app.bundle.js');
-
-      expect(content).to.contain('font.ttf?version=1.0.0');
-      expect(content).to.contain('./image.svg?version=1.0.2&some-other-param=value');
+      expect(content).to.contain(fileAboveTheLimit('image.svg'));
     });
 
+    it('should load svg files', () => {
+      test
+        .setup({
+          'src/client.js': `require('./icon.svg');`,
+          'src/icon.svg': createAboveTheLimitFile(),
+          'package.json': fx.packageJson()
+        })
+        .execute('build');
+
+      const content = test.content('dist/statics/app.bundle.js');
+      expect(content).to.contain(fileAboveTheLimit('icon.svg'));
+    });
+
+    function createAboveTheLimitFile() {
+      return _.repeat('a', 10001);
+    }
+
+    function fileAboveTheLimit(name) {
+      return `__webpack_require__.p + "${name}`;
+    }
   });
 
   describe('Json', () => {
