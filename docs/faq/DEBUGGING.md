@@ -71,6 +71,7 @@ Update mocha configurations:
 
  1. test directory: `{src,test}/**/*.spec.js`
  2. extra mocha options: `--require babel-register --require ./node_modules/yoshi/lib/ignore-extensions ./test/mocha-setup.js --no-timeouts`
+ 3. set environment variable `SRC_PATH='./src'`
 
 And for the Typescript lovers:
 
