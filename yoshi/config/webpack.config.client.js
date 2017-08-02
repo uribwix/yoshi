@@ -8,11 +8,18 @@ const webpackConfigCommon = require('./webpack.config.common');
 const projectConfig = require('./project');
 const DynamicPublicPath = require('../lib/plugins/dynamic-public-path');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const {isObject} = require('lodash');
+const defaultCommonsChunkConfig = {
+  name: 'commons',
+  minChunks: 2
+};
 
 const config = ({debug, separateCss = projectConfig.separateCss(), analyze} = {}) => {
   const projectName = projectConfig.name();
   const cssModules = projectConfig.cssModules();
   const tpaStyle = projectConfig.tpaStyle();
+  const useCommonsChunk = projectConfig.commonsChunk();
+  const commonsChunkConfig = isObject(useCommonsChunk) ? useCommonsChunk : defaultCommonsChunkConfig;
 
   return mergeByConcat(webpackConfigCommon, {
     entry: getEntry(),
@@ -26,6 +33,8 @@ const config = ({debug, separateCss = projectConfig.separateCss(), analyze} = {}
 
     plugins: [
       ...analyze ? [new BundleAnalyzerPlugin()] : [],
+
+      ...useCommonsChunk ? [new webpack.optimize.CommonsChunkPlugin(commonsChunkConfig)] : [],
 
       new webpack.LoaderOptionsPlugin({
         minimize: !debug
@@ -49,7 +58,7 @@ const config = ({debug, separateCss = projectConfig.separateCss(), analyze} = {}
             warnings: false,
           },
         })
-      ]
+      ],
     ],
 
     devtool: inTeamCity() ? 'source-map' : 'cheap-module-source-map',

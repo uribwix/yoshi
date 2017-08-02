@@ -40,6 +40,7 @@ module.exports = {
     }
   },
   entry: () => getConfig('entry'),
+  commonsChunk: () => getConfig('commonsChunk', false),
   defaultEntry: () => './client',
   separateCss: () => getConfig('separateCss', true),
   cssModules: () => getConfig('cssModules', true),

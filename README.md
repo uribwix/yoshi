@@ -121,7 +121,9 @@ You can specify multiple entry points in your `package.json` file. This gives th
 }
 ```
 
-**Note:** the decision whether to use `TypeScript` or `babel` is done by searching `tsconfig.json` inside the root directory.
+**Note:** if you have multiple entries you should consider using the [Commons Chunk Plugin](docs/faq/COMMONS-CHUNK.md)
+
+**Note2:** the decision whether to use `TypeScript` or `babel` is done by searching `tsconfig.json` inside the root directory.
 
 ### test
 
@@ -311,4 +313,5 @@ Use this if you are writing a library and want to publish it as single file. Lib
 - [How do I setup Enzyme test environment?](docs/faq/SETUP-TESTING-WITH-ENZYME.md)
 - [How to disable css modules in specific places](docs/faq/DISABLE-SPECIFIC-CSS-MODULES.md)
 - [How to I analyze my webpack bundle contents](docs/faq/WEBPACK-ANALYZE.md)
+- [How do I separately bundle common logic for multiple entries?](docs/faq/COMMONS-CHUNK.md)
 - [How to use SVG](docs/faq/SVG.md)
