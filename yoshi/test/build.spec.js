@@ -281,6 +281,89 @@ describe('Aggregator: Build', () => {
     });
   });
 
+  describe('Commons chunk plugin', () => {
+    it('should generate an additional commons.bundle.js when commonsChunks option in package.json is true, commons chunk should have the common parts and the other chunks should not', () => {
+      const res = test
+        .setup({
+          'src/dep.js': `module.exports = function(a){return a + 1;};`,
+          'src/app1.js': `const thisIsWorks = true; const aFunction = require('./dep');const a = aFunction(1);`,
+          'src/app2.js': `const hello = "world"; const aFunction = require('./dep');const a = aFunction(1);`,
+          'package.json': fx.packageJson({
+            commonsChunk: true,
+            entry: {
+              first: './app1.js',
+              second: './app2.js'
+            }
+          }),
+          'pom.xml': fx.pom()
+        })
+        .execute('build');
+      expect(res.code).to.equal(0);
+      expect(test.list('dist/statics')).to.contain('first.bundle.js');
+      expect(test.list('dist/statics')).to.contain('second.bundle.js');
+      expect(test.list('dist/statics')).to.contain('commons.bundle.js');
+      expect(test.list('dist/statics')).to.contain('commons.bundle.min.js');
+      expect(test.list('dist/statics')).to.contain('commons.bundle.js.map');
+      expect(test.content('dist/statics/commons.bundle.js')).to.contain('module.exports = function (a) {\n  return a + 1;\n};');
+      expect(test.content('dist/statics/first.bundle.js')).to.not.contain('module.exports = function (a) {\n  return a + 1;\n};');
+      expect(test.content('dist/statics/second.bundle.js')).to.not.contain('module.exports = function (a) {\n  return a + 1;\n};');
+    });
+
+    it('should add commons.css if there is any common css/scss required, the common css should be in the commons.css chunk while not in the other chunks', () => {
+      const res = test
+        .setup({
+          'src/styles.scss': `body { background: red; }`,
+          'src/first.scss': `div { background: blue; }`,
+          'src/second.scss': `div { background: yellow; }`,
+          'src/app1.js': `const thisIsWorks = true; require('./first.scss'); require('./styles.scss');`,
+          'src/app2.js': `const hello = "world"; require('./second.scss'); require('./styles.scss');`,
+          'package.json': fx.packageJson({
+            commonsChunk: true,
+            entry: {
+              first: './app1.js',
+              second: './app2.js'
+            }
+          }),
+          'pom.xml': fx.pom()
+        })
+        .execute('build');
+      expect(res.code).to.equal(0);
+      expect(test.list('dist/statics')).to.contain('first.css');
+      expect(test.list('dist/statics')).to.contain('second.css');
+      expect(test.list('dist/statics')).to.contain('commons.css');
+      expect(test.list('dist/statics')).to.contain('commons.min.css');
+      expect(test.list('dist/statics')).to.contain('commons.css.map');
+      expect(test.content('dist/statics/commons.css')).to.contain('body {\n  background: red; }');
+      expect(test.content('dist/statics/first.css')).to.not.contain('body {\n  background: red; }');
+      expect(test.content('dist/statics/second.css')).to.not.contain('body {\n  background: red; }');
+    });
+
+    it('should pass a custom configuration if an object is passed to the commonsChunk configuration', () => {
+      const res = test
+        .setup({
+          'src/dep.js': `module.exports = function(a){return a + 1;};`,
+          'src/app1.js': `const thisIsWorks = true; const aFunction = require('./dep');const a = aFunction(1);`,
+          'src/app2.js': `const hello = "world"; const aFunction = require('./dep');const a = aFunction(1);`,
+          'package.json': fx.packageJson({
+            commonsChunk: {
+              name: 'myCustomCommonsName',
+              minChunks: 2,
+            },
+            entry: {
+              first: './app1.js',
+              second: './app2.js'
+            }
+          }),
+          'pom.xml': fx.pom()
+        })
+        .execute('build');
+
+      expect(res.code).to.equal(0);
+      expect(test.list('dist/statics')).to.not.contain('commons.bundle.js');
+      expect(test.list('dist/statics')).to.contain('myCustomCommonsName.bundle.js');
+    });
+  });
+
   describe('Bundle', () => {
     ['fs', 'net', 'tls'].forEach(moduleName => {
       it(`should not fail to require node built-ins such as ${moduleName}`, () => {
