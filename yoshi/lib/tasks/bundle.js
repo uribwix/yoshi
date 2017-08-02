@@ -35,8 +35,9 @@ function copyFilesAsMin() {
   return Promise.all(promises);
 }
 
-function bundle() {
-  const debugBundle = runBundle({debug: true});
+function bundle({analyze}) {
+
+  const debugBundle = runBundle({debug: true, analyze});
   const minBundle = inTeamCity() ? runBundle({debug: false}) : debugBundle.then(copyFilesAsMin);
 
   return Promise.all([debugBundle, minBundle]);

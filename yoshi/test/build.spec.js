@@ -10,6 +10,8 @@ const {
 const {
   readFileSync
 } = require('fs');
+const retryPromise = require('retry-promise').default;
+const fetch = require('node-fetch');
 
 describe('Aggregator: Build', () => {
   const defaultOutput = 'statics';
@@ -50,6 +52,23 @@ describe('Aggregator: Build', () => {
       expect(resp.code).to.equal(1);
       expect(resp.stdout).to.contain(`Failed 'sass'`);
       expect(resp.stdout).to.contain('Invalid CSS after ".a {');
+    });
+  });
+
+  describe('with --analyze flag', () => {
+    it('should serve webpack-bundle-analyzer server', () => {
+      const analyzerServerPort = '8888';
+      const analyzerContentPart = 'window.chartData = [{"label":"app.bundle.js"';
+
+      test
+        .setup({
+          'src/client.js': '',
+          'package.json': fx.packageJson()
+        })
+        .spawn('build', ['--analyze']);
+
+      return checkServerIsServing({port: analyzerServerPort})
+        .then(content => expect(content).to.contain(analyzerContentPart));
     });
   });
 
@@ -1138,4 +1157,9 @@ describe('Aggregator: Build', () => {
       // TODO: figure out how to simulate module doesn't exist in registry
     });
   });
+
+  function checkServerIsServing({backoff = 100, max = 100, port = fx.defaultServerPort(), file = ''} = {}) {
+    return retryPromise({backoff, max}, () => fetch(`http://localhost:${port}/${file}`)
+      .then(res => res.text()));
+  }
 });

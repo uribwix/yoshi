@@ -11,6 +11,7 @@ const run = require('./lib/run');
 
 program
   .option('--output <dir>', 'output directory for the static assets', 'statics')
+  .option('--analyze', 'run webpack-bundle-analyzer plugin')
   .parse(process.argv);
 
 const {build} = require('./lib/yoshi-plugins')(program);

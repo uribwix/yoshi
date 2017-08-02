@@ -139,6 +139,7 @@
     "url-loader": "~0.5.9",
     "velocity": "~0.7.2",
     "webpack": "~3.2.0",
+    "webpack-bundle-analyzer": "~2.8.3",
     "webpack-dev-middleware": "~1.11.0",
     "webpack-hot-middleware": "~2.18.2",
     "wix-tpa-style-loader": "~1.0.8",

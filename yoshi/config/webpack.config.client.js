@@ -7,8 +7,9 @@ const {mergeByConcat, isSingleEntry, inTeamCity} = require('../lib/utils');
 const webpackConfigCommon = require('./webpack.config.common');
 const projectConfig = require('./project');
 const DynamicPublicPath = require('../lib/plugins/dynamic-public-path');
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
-const config = ({debug, separateCss = projectConfig.separateCss()} = {}) => {
+const config = ({debug, separateCss = projectConfig.separateCss(), analyze} = {}) => {
   const projectName = projectConfig.name();
   const cssModules = projectConfig.cssModules();
   const tpaStyle = projectConfig.tpaStyle();
@@ -24,6 +25,8 @@ const config = ({debug, separateCss = projectConfig.separateCss()} = {}) => {
     },
 
     plugins: [
+      ...analyze ? [new BundleAnalyzerPlugin()] : [],
+
       new webpack.LoaderOptionsPlugin({
         minimize: !debug
       }),
