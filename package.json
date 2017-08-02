@@ -130,6 +130,7 @@
     "stylelint": "~7.13.0",
     "trier-promise": "~1.0.1",
     "ts-loader": "~2.3.0",
+    "svg-inline-loader": "~0.8.0",
     "ts-node": "~1.7.3",
     "tslint": "~5.5.0",
     "tslint-config-wix": "~1.0.23",

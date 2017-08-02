@@ -37,6 +37,7 @@ const config = {
       require('../lib/loaders/typescript')(projectConfig.isAngularProject()),
       require('../lib/loaders/graphql')(),
       require('../lib/loaders/assets')(),
+      require('../lib/loaders/svg')(),
       require('../lib/loaders/html')(),
       require('../lib/loaders/raw')()
     ]
