@@ -40,7 +40,7 @@ In your `package.json`:
 {
   "scripts": {
     "start": "yoshi start",
-    "pretest": "yoshi lint && yoshi build", 
+    "pretest": "yoshi lint && yoshi build",
     "test": "yoshi test",
     "build": ":",
     "release": "yoshi release" //only needed if you publish to npm
@@ -102,6 +102,7 @@ The following are the default values for the CDN server's port and the mount dir
 Flag | Short Flag | Description | Default Value
 ---- | ---------- | ----------- | ------------
 --output <dir> | | The output directory for static assets. | `statics`
+--analyze | | run webpack-bundle-analyzer plugin. |
 
 This task will perform the following:
 
@@ -215,7 +216,7 @@ We use [css modules](https://github.com/css-modules/css-modules) as default. You
 
   Disabling cssModules on a specific css file is possible by adding `.global` before file extention.
   For example:
-  
+
   `./Counter.global.scss` //no css modules for this file
 
   Using css modules inside your component is easy:
