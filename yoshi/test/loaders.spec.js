@@ -145,6 +145,23 @@ describe('Loaders', () => {
     });
   });
 
+
+  describe('SVG', () => {
+    const svgContent = '<svg><g><path fill="#EEEEEE"></path></g></svg>';
+    const svgModule = 'module.exports = "<svg><g><path fill=\\"#EEEEEE\\"></path></g></svg>"';
+    it('should inline svg', () => {
+      const res = test
+        .setup({
+          'src/client.js': 'require(\'./svgIcon.inline.svg\');',
+          'src/svgIcon.inline.svg': svgContent,
+          'package.json': fx.packageJson()
+        })
+        .execute('build');
+      expect(res.code).to.equal(0);
+      expect(test.content('dist/statics/app.bundle.js')).to.contain(svgModule);
+    });
+  });
+
   describe('Sass', () => {
     afterEach(() => test.teardown());
 
@@ -449,6 +466,32 @@ describe('Loaders', () => {
 
       const content = test.content('dist/statics/app.bundle.js');
       expect(content).to.contain(fileAboveTheLimit('icon.svg'));
+    });
+
+    it('should not load "inline.svg" suffixed files', () => {
+      test
+        .setup({
+          'src/client.js': `require('./icon.inline.svg');`,
+          'src/icon.inline.svg': createAboveTheLimitFile(),
+          'package.json': fx.packageJson()
+        })
+        .execute('build');
+
+      const content = test.content('dist/statics/app.bundle.js');
+      expect(content).not.to.contain(fileAboveTheLimit('icon.inline.svg'));
+    });
+
+    it('should load badly "inline.svg" suffixed files', () => {
+      test
+        .setup({
+          'src/client.js': `require('./icon.inlineW.svg');`,
+          'src/icon.inlineW.svg': createAboveTheLimitFile(),
+          'package.json': fx.packageJson()
+        })
+        .execute('build');
+
+      const content = test.content('dist/statics/app.bundle.js');
+      expect(content).to.contain(fileAboveTheLimit('icon.inlineW.svg'));
     });
 
     function createAboveTheLimitFile() {
