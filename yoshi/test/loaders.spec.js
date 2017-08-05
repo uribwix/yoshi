@@ -431,16 +431,18 @@ describe('Loaders', () => {
       expect(content).to.contain(fileAboveTheLimit('font.eot'));
     });
 
-    it('should load wav files', () => {
+    it('should load wav and mp3 files', () => {
       test
         .setup({
-          'src/client.js': `require('./beep.wav');`,
+          'src/client.js': `require('./beep.wav');require('./beep.mp3');`,
           'src/beep.wav': createAboveTheLimitFile(),
+          'src/beep.mp3': createAboveTheLimitFile(),
         })
         .execute('build');
 
       const content = test.content('dist/statics/app.bundle.js');
       expect(content).to.contain(fileAboveTheLimit('beep.wav'));
+      expect(content).to.contain(fileAboveTheLimit('beep.mp3'));
     });
 
     it('should load files that have a path with query string', () => {
