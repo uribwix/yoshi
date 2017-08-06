@@ -34,3 +34,4 @@ require.extensions['.jpg'] = noop;
 require.extensions['.jpeg'] = noop;
 require.extensions['.gif'] = noop;
 require.extensions['.wav'] = noop;
+require.extensions['.mp3'] = noop;
