@@ -21,6 +21,7 @@ module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
   };
 
   const globalRegex = /\.global.s?css$/;
+  const stylableRegex = /\.st\.css$/;
 
   const getScssRule = (ruleConfig, loaderConfig) => merge(ruleConfig, {
     test: /\.s?css$/,
@@ -48,11 +49,12 @@ module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
 
   return {
     client: [
-      getScssRule({include: globalRegex}, {modules: false}),
-      getScssRule({exclude: globalRegex})
+      getScssRule({include: globalRegex, exclude: stylableRegex}, {modules: false}),
+      getScssRule({exclude: [globalRegex, stylableRegex]})
     ],
     specs: {
       test: /\.s?css$/,
+      exclude: [stylableRegex],
       use: [
         {
           loader: 'css-loader/locals',
