@@ -38,13 +38,13 @@ function printErrors(err) {
 module.exports = ({log, watch, base, projectConfig}) => {
   const files = [path.join(base(), '**', '*.js{,x}'), 'index.js'];
 
-  function transpile({babelConfig = {}, destDir = 'dist'}) {
+  const transpile = ({babelConfig = {}, destDir = 'dist'}) => (pattern = files) => {
     return new Promise((resolve, reject) => {
       const interceptor = createInterceptor(resolve, reject);
 
       mkdirp(path.resolve('target'));
 
-      gulp.src(files, {base: '.'})
+      gulp.src(pattern, {base: '.'})
         .pipe(interceptor.catchErrors())
         .pipe(fileTransformCache({
           path: path.resolve('target', '.babel-cache'),
@@ -54,16 +54,16 @@ module.exports = ({log, watch, base, projectConfig}) => {
         .pipe(gulp.dest(destDir))
         .once('end', interceptor.flush);
     });
-  }
+  };
 
   function babel({done = noop} = {}) {
     const transpileEsModules = projectConfig.isEsModule() && !watch;
 
-    const transpileFn = () => transpile({
+    const transpileFn = transpile({
       destDir: transpileEsModules ? 'dist/es' : 'dist'
     });
 
-    const transpileWithCommonJsFn = () => transpile({
+    const transpileWithCommonJsFn = transpile({
       destDir: 'dist',
       babelConfig: {
         plugins: [
@@ -72,12 +72,15 @@ module.exports = ({log, watch, base, projectConfig}) => {
       }
     });
 
-    const transpileThenDone = () => Promise.all(
-      [transpileWithCommonJsFn(), ...transpileEsModules ? [transpileFn()] : []]
-    ).then(done);
+    const transpileThenDone = pattern => {
+      const promises = [transpileWithCommonJsFn, ...transpileEsModules ? [transpileFn] : []]
+        .map(f => f(pattern));
+
+      return Promise.all(promises).then(done);
+    };
 
     if (watch) {
-      gulp.watch(files, transpileThenDone);
+      gulp.watch(files, event => transpileThenDone(event.path));
     }
 
     return transpileThenDone();

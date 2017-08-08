@@ -5,7 +5,6 @@ const tp = require('test-phases');
 const stripAnsi = require('strip-ansi');
 const intercept = require('intercept-stdout');
 const babel = require('../index');
-const hooks = require('./helpers/hooks');
 
 describe('Babel', () => {
   let test;
@@ -117,21 +116,10 @@ describe('Babel', () => {
           'package.json': `{
             "name": "a",
             "version": "1.0.4",
-            "module": "./dist/es/src/a.js",
-            "dependencies": {
-              "babel-preset-es2015": "latest"
-            },
-            "babel": {
-              "presets": [
-                ["es2015", {
-                  "modules": false
-                }]
-              ]
-            }
+            "module": "./dist/es/src/a.js"
           }`,
-          'src/a.js': `import b from './b'`,
-          'src/b.js': 'export default 1'
-        }, [hooks.installDependencies]);
+          'src/a.js': `import b from './b'`
+        });
 
         return task({esModule: true})
           .then(() => {
@@ -145,21 +133,10 @@ describe('Babel', () => {
           'package.json': `{
             "name": "a",
             "version": "1.0.4",
-            "module": "./dist/es/src/a.js",
-            "dependencies": {
-              "babel-preset-es2015": "latest"
-            },
-            "babel": {
-              "presets": [
-                ["es2015", {
-                  "modules": false
-                }]
-              ]
-            }
+            "module": "./dist/es/src/a.js"
           }`,
-          'src/a.js': `import b from './b'`,
-          'src/b.js': 'export default 1'
-        }, [hooks.installDependencies]);
+          'src/a.js': `import b from './b'`
+        });
 
         return task({watch: true, esModule: true})
           .then(() => {
