@@ -63,7 +63,8 @@ const runServer = ({entryPoint}) => {
     }, 500);
 
     server.stderr.on('data', buffer => {
-      if (buffer.toString().includes('wix:error')) {
+      //exclude petri server error because it always appear, send complaints to daniel
+      if (buffer.toString().includes('wix:error') && !buffer.toString().includes('Failed to communicate with petri server')) {
         displayErrors();
       }
     });
