@@ -292,30 +292,30 @@ describe('Loaders', () => {
     }
   });
 
-  describe('Stylable', () => {
-    afterEach(() => test.teardown());
+  // describe('Stylable', () => {
+  //   afterEach(() => test.teardown());
 
-    describe('client', () => {
-      beforeEach(() => setupAndBuild());
+  //   describe('client', () => {
+  //     beforeEach(() => setupAndBuild());
 
-      it('should run stylable loader over imported .st.css files', () => {
-        expect(test.content('dist/statics/app.bundle.js')).to.match(/".Test.*some-rule {\\n\s*?color: red\\n}"/);
-      });
-    });
+  //     it('should run stylable loader over imported .st.css files', () => {
+  //       expect(test.content('dist/statics/app.bundle.js')).to.match(/".Test.*some-rule {\\n\s*?color: red\\n}"/);
+  //     });
+  //   });
 
-    function setupAndBuild(config) {
-      test
-        .setup({
-          'src/client.js': `require('./some-css.st.css');`,
-          'src/server.js': `require('./some-css.st.css');`,
-          'src/some-css.st.css': `/* comment */
-                                  @namespace "Test";
-                                  .some-rule { color: red; }`,
-          'package.json': fx.packageJson(config || {})
-        })
-        .execute('build', [], getMockedCI({ci: false}));
-    }
-  });
+  //   function setupAndBuild(config) {
+  //     test
+  //       .setup({
+  //         'src/client.js': `require('./some-css.st.css');`,
+  //         'src/server.js': `require('./some-css.st.css');`,
+  //         'src/some-css.st.css': `/* comment */
+  //                                 @namespace "Test";
+  //                                 .some-rule { color: red; }`,
+  //         'package.json': fx.packageJson(config || {})
+  //       })
+  //       .execute('build', [], getMockedCI({ci: false}));
+  //   }
+  // });
 
   describe('Less', () => {
     afterEach(() => test.teardown());
