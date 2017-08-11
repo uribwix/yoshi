@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash/fp');
 const express = require('express');
 const {expect} = require('chai');
 const psTree = require('ps-tree');
@@ -294,6 +293,40 @@ describe('Aggregator: Start', () => {
             .then(content => expect(content).to.contain(newSource));
         });
       });
+
+      describe('with --manual-restart flag', () => {
+        beforeEach(() => {
+          child = test
+            .setup({
+              'src/someFile.js': '',
+              'index.js': `
+                console.log('onInit');
+                setInterval(() => {}, 1000);
+                process.on('SIGHUP', () => console.log('onRestart'));
+              `,
+              'package.json': fx.packageJson(),
+              '.babelrc': '{}'
+            })
+            .spawn('start', ['--manual-restart']);
+        });
+
+        it('should send SIGHUP to entryPoint process on change', () =>
+          checkServerLogContains('onInit')
+            .then(() => triggerChangeAndCheckForRestartMessage())
+        );
+
+        it('should not restart server', () =>
+          checkServerLogContains('onInit', {backoff: 200})
+            .then(() => triggerChangeAndCheckForRestartMessage())
+            .then(() => expect(serverLogContent()).to.not.contain('onInit'))
+        );
+
+        function triggerChangeAndCheckForRestartMessage() {
+          clearServerLog();
+          test.modify('src/someFile.js', ' ');
+          return checkServerLogContains('onRestart', {backoff: 200});
+        }
+      });
     });
 
     it('should use yoshi-update-node-version', () => {
@@ -367,18 +400,26 @@ describe('Aggregator: Start', () => {
     });
   }
 
-  function checkServerLogCreated() {
-    return retryPromise({backoff: 100}, () =>
+  function checkServerLogCreated({backoff = 100} = {}) {
+    return retryPromise({backoff}, () =>
       test.contains('target/server.log') ?
         Promise.resolve() :
-        Promise.reject()
+        Promise.reject(new Error('No server.log found'))
     );
   }
 
-  function checkServerLogContains(str) {
-    return checkServerLogCreated().then(() =>
-      retryPromise({backoff: 100}, () => {
-        const content = test.content('target/server.log');
+  function serverLogContent() {
+    return test.content('target/server.log');
+  }
+
+  function clearServerLog() {
+    test.write('target/server.log', '');
+  }
+
+  function checkServerLogContains(str, {backoff = 100} = {}) {
+    return checkServerLogCreated({backoff}).then(() =>
+      retryPromise({backoff}, () => {
+        const content = serverLogContent();
 
         return content.includes(str) ?
           Promise.resolve() :

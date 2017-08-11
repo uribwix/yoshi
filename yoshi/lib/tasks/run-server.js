@@ -17,7 +17,12 @@ function writeToServerLog(data) {
   fs.appendFile('target/server.log', data);
 }
 
-const runServer = ({entryPoint}) => {
+const runServer = ({entryPoint, manualRestart}) => {
+  if (server && manualRestart) {
+    server.kill('SIGHUP');
+    return Promise.resolve(server);
+  }
+
   const serverScript = path.resolve(entryPoint);
 
   if (!fs.existsSync(serverScript)) {
