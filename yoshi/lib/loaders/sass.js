@@ -4,6 +4,7 @@ const path = require('path');
 const {merge} = require('lodash/fp');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const {cssModulesPattren} = require('yoshi-runtime');
+const useResolveUrlLoader = process.env.RESOLVE_URL_LOADER === 'true';
 
 module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
   const cssLoaderOptions = {
@@ -40,6 +41,7 @@ module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
         }
       },
       ...tpaStyle ? ['wix-tpa-style-loader'] : [],
+      ...useResolveUrlLoader ? ['resolve-url-loader'] : [],
       {
         loader: 'sass-loader',
         options: sassLoaderOptions

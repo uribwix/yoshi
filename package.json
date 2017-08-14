@@ -119,6 +119,7 @@
     "react-loadable": "~3.3.1",
     "react-test-renderer": "~15.6.1",
     "require-reload": "~0.2.2",
+    "resolve-url-loader": "~2.1.0",
     "retry-promise": "~1.0.0",
     "sass-loader": "~6.0.6",
     "screenshot-reporter": "~1.1.3",

@@ -145,7 +145,6 @@ describe('Loaders', () => {
     });
   });
 
-
   describe('SVG', () => {
     const svgContent = '<svg><g><path fill="#EEEEEE"></path></g></svg>';
     const svgModule = 'module.exports = "<svg><g><path fill=\\"#EEEEEE\\"></path></g></svg>"';
@@ -289,6 +288,29 @@ describe('Loaders', () => {
           'package.json': fx.packageJson(config || {}),
         })
         .execute('build', [], getMockedCI({ci: false}));
+    }
+  });
+
+  describe('Resolve url loader', () => {
+    it('should resolve relative paths in url() statements based on the original source file when RESOLVE_URL_LOADER defined', () => {
+      const res = setup().execute('build', [], {RESOLVE_URL_LOADER: true});
+      expect(res.code).to.equal(0);
+    });
+
+    it('should not resolve url() correctly without RESOLVE_URL_LOADER flag', () => {
+      const res = setup().execute('build');
+      expect(res.code).to.equal(1);
+    });
+
+    function setup() {
+      return test
+        .setup({
+          'src/client.js': `require('./some-css.scss');`,
+          'src/some-css.scss': '@import "./foo/imported"',
+          'src/foo/imported.scss': `.foo{background: url('./bar.svg');}`,
+          'src/foo/bar.svg': '',
+          'package.json': fx.packageJson(),
+        });
     }
   });
 
