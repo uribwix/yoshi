@@ -40,8 +40,8 @@ module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
           sourceMap: true
         }
       },
-      ...tpaStyle ? ['wix-tpa-style-loader'] : [],
       ...useResolveUrlLoader ? ['resolve-url-loader'] : [],
+      ...tpaStyle ? ['wix-tpa-style-loader'] : [],
       {
         loader: 'sass-loader',
         options: sassLoaderOptions

@@ -292,9 +292,23 @@ describe('Loaders', () => {
   });
 
   describe('Resolve url loader', () => {
-    it('should resolve relative paths in url() statements based on the original source file when RESOLVE_URL_LOADER defined', () => {
-      const res = setup().execute('build', [], {RESOLVE_URL_LOADER: true});
-      expect(res.code).to.equal(0);
+    describe('with RESOLVE_URL_LOADER env variable', () => {
+      it('should resolve relative paths in url() statements based on the original source file', () => {
+        const res = setup().execute('build', [], {RESOLVE_URL_LOADER: true});
+        expect(res.code).to.equal(0);
+      });
+
+      it('should run after wix-tpa-style loader', () => {
+        const res = test
+          .setup({
+            'src/client.js': `require('./some-css.scss');`,
+            'src/some-css.scss': '.foo {color: unquote("{{color-1}}")}',
+            'package.json': fx.packageJson({tpaStyle: true}),
+          })
+          .execute('build', [], {RESOLVE_URL_LOADER: true});
+
+        expect(res.code).to.equal(0);
+      });
     });
 
     it('should not resolve url() correctly without RESOLVE_URL_LOADER flag', () => {
