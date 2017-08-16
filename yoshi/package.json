@@ -9,8 +9,9 @@
   "scripts": {
     "postinstall": "npm install --silent --prefix private screenshot-reporter-env wix-eyes-env || true",
     "build": ":",
+    "lint": "eslint .",
     "test": "mocha './test/{,!(fixtures)/**/}/*.spec.js'",
-    "posttest": "eslint .",
+    "posttest": "npm run lint",
     "release": "wnpm-release --no-shrinkwrap"
   },
   "bin": {

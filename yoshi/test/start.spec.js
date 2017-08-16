@@ -2,7 +2,7 @@
 
 const express = require('express');
 const {expect} = require('chai');
-const psTree = require('ps-tree');
+const {killSpawnProcessAndHisChildren} = require('./helpers/process');
 const tp = require('./helpers/test-phases');
 const fx = require('./helpers/fixtures');
 const fetch = require('node-fetch');
@@ -20,9 +20,9 @@ describe('Aggregator: Start', () => {
       child = null;
     });
 
-    afterEach(done => {
+    afterEach(() => {
       test.teardown();
-      killSpawnProcessAndHisChildren(done);
+      return killSpawnProcessAndHisChildren(child);
     });
 
     describe('tests', function () {
@@ -380,25 +380,6 @@ describe('Aggregator: Start', () => {
       });
     });
   });
-
-  function killSpawnProcessAndHisChildren(done) {
-    if (!child) {
-      return done();
-    }
-
-    const pid = child.pid;
-
-    psTree(pid, (err /*eslint handle-callback-err: 0*/, children) => {
-      [pid].concat(children.map(p => p.PID)).forEach(tpid => {
-        try {
-          process.kill(tpid, 'SIGKILL');
-        } catch (e) {}
-      });
-
-      child = null;
-      done();
-    });
-  }
 
   function checkServerLogCreated({backoff = 100} = {}) {
     return retryPromise({backoff}, () =>

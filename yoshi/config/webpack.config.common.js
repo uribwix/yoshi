@@ -1,12 +1,9 @@
 'use strict';
 
 const path = require('path');
-const webpack = require('webpack');
 const context = path.resolve('./src');
 const projectConfig = require('./project');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-
-const disableModuleConcatenation = process.env.DISABLE_MODULE_CONCATENATION === 'true';
 
 const config = {
   context,
@@ -27,7 +24,6 @@ const config = {
   },
 
   plugins: [
-    ...disableModuleConcatenation ? [] : [new webpack.optimize.ModuleConcatenationPlugin()],
     new CaseSensitivePathsPlugin()
   ],
 

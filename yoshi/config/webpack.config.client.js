@@ -14,7 +14,8 @@ const defaultCommonsChunkConfig = {
   minChunks: 2
 };
 
-const config = ({debug, separateCss = projectConfig.separateCss(), analyze} = {}) => {
+const config = ({debug, separateCss = projectConfig.separateCss(), analyze, disableModuleConcatenation} = {}) => {
+  const disableModuleConcat = process.env.DISABLE_MODULE_CONCATENATION === 'true' || disableModuleConcatenation;
   const projectName = projectConfig.name();
   const cssModules = projectConfig.cssModules();
   const tpaStyle = projectConfig.tpaStyle();
@@ -33,8 +34,8 @@ const config = ({debug, separateCss = projectConfig.separateCss(), analyze} = {}
     },
 
     plugins: [
+      ...disableModuleConcat ? [] : [new webpack.optimize.ModuleConcatenationPlugin()],
       ...analyze ? [new BundleAnalyzerPlugin()] : [],
-
       ...useCommonsChunk ? [new webpack.optimize.CommonsChunkPlugin(commonsChunkConfig)] : [],
 
       new webpack.LoaderOptionsPlugin({
