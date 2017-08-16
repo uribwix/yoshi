@@ -13,7 +13,9 @@ module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
     localIdentName: cssModulesPattren(),
     hashPrefix: projectName,
     modules: cssModules,
-    importLoaders: tpaStyle ? 4 : 3
+    importLoaders: 2 /* postcss plugins and sass-loader (so composition will work with import) */ +
+      Number(tpaStyle) +
+      Number(useResolveUrlLoader)
   };
 
   const sassLoaderOptions = {

@@ -309,6 +309,20 @@ describe('Loaders', () => {
 
         expect(res.code).to.equal(0);
       });
+
+      it('should increase importLoaders in order to support native @import', () => {
+        test
+          .setup({
+            'src/client.js': `require('./some.css');`,
+            'src/some.css': '@import "./other.css"',
+            'src/other.css': '.foo {appearance: smth; color: unquote("{{color-1}}")}',
+            'package.json': fx.packageJson({tpaStyle: true}),
+          })
+          .execute('build', [], {RESOLVE_URL_LOADER: true});
+
+        expect(test.content('dist/statics/app.css')).to.contain('-webkit-appearance');
+        expect(test.content('dist/statics/app.css')).to.not.contain('unquote("{{color-1}}")');
+      });
     });
 
     it('should not resolve url() correctly without RESOLVE_URL_LOADER flag', () => {
@@ -326,6 +340,22 @@ describe('Loaders', () => {
           'package.json': fx.packageJson(),
         });
     }
+  });
+
+  describe('Wix TPA style', () => {
+    it('should increase importLoaders in order to support native @import', () => {
+      test
+        .setup({
+          'src/client.js': `require('./some.css');`,
+          'src/some.css': '@import "./other.css"',
+          'src/other.css': '.foo {appearance: smth; color: unquote("{{color-1}}")}',
+          'package.json': fx.packageJson({tpaStyle: true}),
+        })
+        .execute('build', []);
+
+      expect(test.content('dist/statics/app.css')).to.contain('-webkit-appearance');
+      expect(test.content('dist/statics/app.css')).to.not.contain('unquote("{{color-1}}")');
+    });
   });
 
   describe('Stylable', () => {
