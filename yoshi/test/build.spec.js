@@ -32,7 +32,6 @@ describe('Aggregator: Build', () => {
           'package.json': fx.packageJson()
         })
         .execute('build');
-
       expect(resp.code).to.equal(0);
       expect(resp.stdout).to.contain(`Finished 'sass'`);
       expect(test.content('dist/app/a/style.scss')).to.contain(compiledStyle);
@@ -404,9 +403,9 @@ describe('Aggregator: Build', () => {
           'pom.xml': fx.pom()
         })
         .execute('build');
-
       expect(res.code).to.equal(1);
-      expect(res.stdout).to.contain('Unexpected token (2:0)');
+      expect(res.stdout).to.contain('Module build failed:');
+      expect(res.stderr).to.contain('Unexpected token (2:0)');
     });
 
     it('should generate a bundle using different entry', () => {

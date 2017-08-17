@@ -48,6 +48,7 @@
     "gulp": "~3.9.1",
     "gulp-util": "~3.0.8",
     "gulp-watch": "~4.3.11",
+    "happypack": "3.0.2",
     "html-loader": "~0.4.5",
     "jasmine": "~2.6.0",
     "jasmine-reporters": "~2.2.0",
