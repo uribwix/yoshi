@@ -1,9 +1,9 @@
 'use strict';
 
 const path = require('path');
-const graphite = require('graphite-tcp');
 const fs = require('fs');
 const glob = require('glob');
+const mysql = require('mysql');
 
 const fsStatP = filePath => new Promise((resolve, reject) => {
   fs.stat(filePath, (err, stats) => {
@@ -38,38 +38,58 @@ const getBundleNames = () => {
   return globAsync(path.resolve(process.cwd(), 'dist/statics/*.min.@(js|css)'));
 };
 
-const replaceDotsWithUnderscore = str => str.replace(/\./g, '_');
+const database = {
+  connection: null,
+  getConnection() {
+    if (!this.connection) {
+      this.connection = mysql.createConnection({
+        host: process.env.FEDOPS_BUILD_REPORT_SQL_HOST,
+        user: process.env.FEDOPS_BUILD_REPORT_SQL_USER,
+        password: process.env.FEDOPS_BUILD_REPORT_SQL_PASS,
+        database: process.env.FEDOPS_BUILD_REPORT_SQL_DB
+      });
+    }
 
-const command = ({appName, bundleName}) => {
-  const metricNames = {
-    app_name: replaceDotsWithUnderscore(appName), // eslint-disable-line camelcase
-    bundle_name: replaceDotsWithUnderscore(path.relative(path.join(process.cwd(), 'dist/statics'), bundleName)), // eslint-disable-line camelcase
-  };
+    return this.connection;
+  },
+  end() {
+    if (this.connection) {
+      return new Promise((resolve, reject) => {
+        this.connection.end(err => {
+          if (err) {
+            return reject(err);
+          }
 
-  const metricNamesSeparator = '.';
-  const bundleSizeMetricName = 'bundle_size';
+          resolve();
+        });
+      });
+    }
 
-  return ''.concat(
-    Object.keys(metricNames).map(key => `${key}=${metricNames[key]}`).join(metricNamesSeparator),
-    metricNamesSeparator,
-    `${bundleSizeMetricName}`
-  );
+    return Promise.resolve();
+  }
 };
 
 const reportBundleSize = params => {
   return new Promise(resolve => {
     return fsStatP(path.resolve(process.cwd(), params.bundleName))
       .then(stats => {
-        const metric = graphite.createClient({
-          host: 'm.wixpress.com',
-          port: 2003,
-          prefix: 'wix-bi-tube.root=events_catalog.src=72',
-          callback: () => {
-            resolve();
-            metric.close();
+        const bundleName = path.relative(path.join(process.cwd(), 'dist/statics'), params.bundleName);
+        const sql = 'INSERT INTO ?? (name, bundle_name, bundle_size) VALUES (?, ?, ?)';
+        const values = [
+          process.env.FEDOPS_BUILD_REPORT_SQL_TABLE,
+          params.appName,
+          bundleName,
+          stats.size || 0
+        ];
+        const handleQueryResult = err => {
+          if (err) {
+            console.warn(`Error code ${err.code}. Failed to write bundle size to the database. ` +
+              `App: ${params.appName}. Bundle: ${bundleName}.bundle.min.js`);
           }
-        });
-        metric.put(command(params), stats.size || 0);
+
+          resolve();
+        };
+        database.getConnection().query(sql, values, handleQueryResult);
       })
       .catch(err => {
         console.warn(`Error code ${err.code}. Failed to find size of file ${params.bundleName}.bundle.min.js.`);
@@ -114,6 +134,7 @@ module.exports = ({log, inTeamCity}) => {
       .then(bundleNames => {
         return Promise.all(bundleNames.map(sendStream(config)));
       })
+      .then(() => database.end())
       .catch(e => {
         console.warn('Bundle size report error:', e);
         return Promise.resolve();

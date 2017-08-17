@@ -7,21 +7,20 @@ const sinon = require('sinon');
 chai.use(sinonChai);
 const {expect} = chai;
 
-
-const graphitePutSpy = sinon.spy();
-const graphiteCloseSpy = sinon.spy();
-const createClient = ({prefix, port, host, callback}) => {
-  return {
-    put: (m, v) => {
-      graphitePutSpy(`${prefix}.${m} ${v} host=${host} port=${port}`);
-      callback();
-    },
-    close: graphiteCloseSpy
-  };
-};
+let mysqlQueryError = null;
+const mysqlQuerySpy = sinon.spy((sql, values, callback) => {
+  callback(mysqlQueryError);
+});
+const mysqlEndSpy = sinon.spy(callback => {
+  callback();
+});
+const createConnection = () => ({
+  query: mysqlQuerySpy,
+  end: mysqlEndSpy
+});
 
 const fedopsBundleSize = proxyquire('../index', {
-  'graphite-tcp': {createClient} // eslint-disable-line camelcase
+  'mysql': {createConnection}
 });
 
 const APP_NAME = 'your-unique-app-name'; // eslint-disable-line camelcase
@@ -51,9 +50,34 @@ describe('measure bundle size', () => {
     return fedopsBundleSize(Object.assign({}, defaults, rest));
   };
 
-  const output = (bundleName, fileContent, appName = APP_NAME) => {
-    return `wix-bi-tube.root=events_catalog.src=72.app_name=${appName}.bundle_name=${bundleName}.bundle_size ${bundleSize(fileContent)} host=m.wixpress.com port=2003`;
+  const envVariables = new Map([
+    ['FEDOPS_BUILD_REPORT_SQL_HOST', 'host'],
+    ['FEDOPS_BUILD_REPORT_SQL_USER', 'user'],
+    ['FEDOPS_BUILD_REPORT_SQL_PASS', 'pass'],
+    ['FEDOPS_BUILD_REPORT_SQL_DB', 'db'],
+    ['FEDOPS_BUILD_REPORT_SQL_TABLE', 'table']
+  ]);
+
+  const dbQueryValues = (bundleName, fileContent, appName = APP_NAME) => {
+    const table = envVariables.get('FEDOPS_BUILD_REPORT_SQL_TABLE');
+
+    return [
+      table,
+      appName,
+      bundleName,
+      bundleSize(fileContent)
+    ];
   };
+
+  before(() => {
+    envVariables.forEach((value, key) => process.env[key] = value);
+  });
+
+  after(() => {
+    for (let key of envVariables.keys()) {
+      delete process.env[key];
+    }
+  });
 
   beforeEach(() => {
     test = tp.create();
@@ -63,8 +87,8 @@ describe('measure bundle size', () => {
 
   afterEach(() => {
     test.teardown();
-    graphitePutSpy.reset();
-    graphiteCloseSpy.reset();
+    mysqlQuerySpy.reset();
+    mysqlEndSpy.reset();
     clock.restore();
   });
 
@@ -75,8 +99,8 @@ describe('measure bundle size', () => {
     });
     const task = createTask({inTeamCity: () => false});
     return task().then(() => {
-      expect(graphitePutSpy).not.to.have.been.called;
-      expect(graphiteCloseSpy).not.to.have.been.called;
+      expect(mysqlQuerySpy).not.to.have.been.called;
+      expect(mysqlEndSpy).not.to.have.been.called;
     });
   });
 
@@ -86,8 +110,8 @@ describe('measure bundle size', () => {
     });
     const task = createTask({inTeamCity: () => false});
     return task().then(() => {
-      expect(graphitePutSpy).not.to.have.been.called;
-      expect(graphiteCloseSpy).not.to.have.been.called;
+      expect(mysqlQuerySpy).not.to.have.been.called;
+      expect(mysqlEndSpy).not.to.have.been.called;
     });
   });
 
@@ -98,9 +122,9 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_js', someFileContent));
+      expect(mysqlQuerySpy).to.have.been.calledOnce;
+      expect(mysqlEndSpy).to.have.been.calledOnce;
+      expect(mysqlQuerySpy.firstCall.args[1]).to.eql(dbQueryValues('app.bundle.min.js', someFileContent));
     });
   });
 
@@ -111,9 +135,10 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_css', cssFileContent));
+      expect(mysqlQuerySpy).to.have.been.calledOnce;
+      expect(mysqlEndSpy).to.have.been.calledOnce;
+      expect(mysqlQuerySpy.firstCall.args.length).equal(3);
+      expect(mysqlQuerySpy.firstCall.args[1]).to.eql(dbQueryValues('app.bundle.min.css', cssFileContent));
     });
   });
 
@@ -126,11 +151,11 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledThrice;
-      expect(graphiteCloseSpy).to.have.been.calledThrice;
-      expect(graphitePutSpy.getCall(0).args[0]).to.equal(output('a_bundle_min_css', cssFileContent));
-      expect(graphitePutSpy.getCall(1).args[0]).to.equal(output('a_bundle_min_js', someFileContent));
-      expect(graphitePutSpy.getCall(2).args[0]).to.equal(output('b_bundle_min_js', someOtherFileContent));
+      expect(mysqlQuerySpy).to.have.been.calledThrice;
+      expect(mysqlEndSpy).to.have.been.calledOnce;
+      expect(mysqlQuerySpy.getCall(0).args[1]).to.eql(dbQueryValues('a.bundle.min.css', cssFileContent));
+      expect(mysqlQuerySpy.getCall(1).args[1]).to.eql(dbQueryValues('a.bundle.min.js', someFileContent));
+      expect(mysqlQuerySpy.getCall(2).args[1]).to.eql(dbQueryValues('b.bundle.min.js', someOtherFileContent));
     });
   });
 
@@ -144,38 +169,10 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledTwice;
-      expect(graphiteCloseSpy).to.have.been.calledTwice;
-      expect(graphitePutSpy.getCall(0).args[0]).to.equal(output('b_bundle_min_css', cssFileContent));
-      expect(graphitePutSpy.getCall(1).args[0]).to.equal(output('b_bundle_min_js', someFileContent));
-    });
-  });
-
-  it('should replace dots with underscore in project name', () => {
-    test.setup({
-      'dist/statics/app.bundle.min.js': someFileContent,
-      'fedops.json': JSON.stringify({
-        app_name: 'proj.with.dots' // eslint-disable-line camelcase
-      }, null, 2)
-    });
-    const task = createTask();
-    return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_js', someFileContent, 'proj_with_dots'));
-    });
-  });
-
-  it('should replace dots with underscore in bundle file name', () => {
-    test.setup({
-      'dist/statics/bundle.with.dots.bundle.min.js': someFileContent,
-      'fedops.json': fedopsJson
-    });
-    const task = createTask();
-    return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('bundle_with_dots_bundle_min_js', someFileContent));
+      expect(mysqlQuerySpy).to.have.been.calledTwice;
+      expect(mysqlEndSpy).to.have.been.calledOnce;
+      expect(mysqlQuerySpy.getCall(0).args[1]).to.eql(dbQueryValues('b.bundle.min.css', cssFileContent));
+      expect(mysqlQuerySpy.getCall(1).args[1]).to.eql(dbQueryValues('b.bundle.min.js', someFileContent));
     });
   });
 
@@ -187,10 +184,10 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledTwice;
-      expect(graphiteCloseSpy).to.have.been.calledTwice;
-      expect(graphitePutSpy.getCall(0).args[0]).to.equal(output('a_bundle_min_css', cssFileContent));
-      expect(graphitePutSpy.getCall(1).args[0]).to.equal(output('a_bundle_min_js', someFileContent));
+      expect(mysqlQuerySpy).to.have.been.calledTwice;
+      expect(mysqlEndSpy).to.have.been.calledOnce;
+      expect(mysqlQuerySpy.getCall(0).args[1]).to.eql(dbQueryValues('a.bundle.min.css', cssFileContent));
+      expect(mysqlQuerySpy.getCall(1).args[1]).to.eql(dbQueryValues('a.bundle.min.js', someFileContent));
     });
   });
 
@@ -203,12 +200,12 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.callCount(4);
-      expect(graphiteCloseSpy).to.have.callCount(4);
-      expect(graphitePutSpy.getCall(0).args[0]).to.equal(output('a_bundle_min_css', cssFileContent));
-      expect(graphitePutSpy.getCall(1).args[0]).to.equal(output('a_bundle_min_css', cssFileContent, ANOTHER_APP_NAME));
-      expect(graphitePutSpy.getCall(2).args[0]).to.equal(output('a_bundle_min_js', someFileContent));
-      expect(graphitePutSpy.getCall(3).args[0]).to.equal(output('a_bundle_min_js', someFileContent, ANOTHER_APP_NAME));
+      expect(mysqlQuerySpy).to.have.callCount(4);
+      expect(mysqlEndSpy).to.have.calledOnce;
+      expect(mysqlQuerySpy.getCall(0).args[1]).to.eql(dbQueryValues('a.bundle.min.css', cssFileContent));
+      expect(mysqlQuerySpy.getCall(1).args[1]).to.eql(dbQueryValues('a.bundle.min.css', cssFileContent, ANOTHER_APP_NAME));
+      expect(mysqlQuerySpy.getCall(2).args[1]).to.eql(dbQueryValues('a.bundle.min.js', someFileContent));
+      expect(mysqlQuerySpy.getCall(3).args[1]).to.eql(dbQueryValues('a.bundle.min.js', someFileContent, ANOTHER_APP_NAME));
     });
   });
 
@@ -219,9 +216,9 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_js', someFileContent));
+      expect(mysqlQuerySpy).to.have.calledOnce;
+      expect(mysqlEndSpy).to.have.calledOnce;
+      expect(mysqlQuerySpy.getCall(0).args[1]).to.eql(dbQueryValues('app.bundle.min.js', someFileContent));
     });
   });
 
@@ -232,8 +229,8 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).not.to.have.been.called;
-      expect(graphiteCloseSpy).not.to.have.been.called;
+      expect(mysqlQuerySpy).not.to.have.been.called;
+      expect(mysqlEndSpy).to.have.been.called;
     });
   });
 
@@ -244,9 +241,26 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_js', someFileContent));
+      expect(mysqlQuerySpy).to.have.calledOnce;
+      expect(mysqlEndSpy).to.have.calledOnce;
+      expect(mysqlQuerySpy.getCall(0).args[1]).to.eql(dbQueryValues('app.bundle.min.js', someFileContent));
+    });
+  });
+
+  it('should warn if bundle size SQL query fails', () => {
+    test.setup({
+      'dist/statics/app.bundle.min.js': someFileContent,
+      'fedops.json': `{"appName": "${APP_NAME}"}`
+    });
+    const task = createTask();
+    sinon.spy(console, 'warn');
+    mysqlQueryError = {code: 'somecode'};
+    return task().then(() => {
+      const expectedWarning = 'Error code somecode. Failed to write bundle size to the database. ' +
+        'App: your-unique-app-name. Bundle: app.bundle.min.js.bundle.min.js';
+      expect(console.warn).to.have.been.calledOnce;
+      expect(console.warn).to.have.been.calledWith(expectedWarning);
+      console.warn.restore();
     });
   });
 });
