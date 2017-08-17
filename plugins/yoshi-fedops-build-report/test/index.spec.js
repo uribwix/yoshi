@@ -20,7 +20,7 @@ const createConnection = () => ({
 });
 
 const fedopsBundleSize = proxyquire('../index', {
-  'mysql': {createConnection}
+  mysql: {createConnection}
 });
 
 const APP_NAME = 'your-unique-app-name'; // eslint-disable-line camelcase
