@@ -261,6 +261,7 @@ describe('measure bundle size', () => {
       expect(console.warn).to.have.been.calledOnce;
       expect(console.warn).to.have.been.calledWith(expectedWarning);
       console.warn.restore();
+      mysqlQueryError = null;
     });
   });
 });
