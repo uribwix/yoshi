@@ -6,6 +6,7 @@ function createHappyPlugin(id, loaders) {
     id: id,
     loaders: loaders,
     threadPool: happyThreadPool,
+    tempDir: 'target/.happypath',
     enabled: process.env.HAPPY !== '0',
     cache: process.env.HAPPY_CACHE !== '0',
     verbose: process.env.HAPPY_VERBOSE === '1',
