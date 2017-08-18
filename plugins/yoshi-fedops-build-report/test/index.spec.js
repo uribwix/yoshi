@@ -7,21 +7,15 @@ const sinon = require('sinon');
 chai.use(sinonChai);
 const {expect} = chai;
 
-
-const graphitePutSpy = sinon.spy();
-const graphiteCloseSpy = sinon.spy();
-const createClient = ({prefix, port, host, callback}) => {
+const fetchSpy = sinon.spy(function() {
   return {
-    put: (m, v) => {
-      graphitePutSpy(`${prefix}.${m} ${v} host=${host} port=${port}`);
-      callback();
-    },
-    close: graphiteCloseSpy
+    then: () => {},
+    catch: () => {}
   };
-};
+});
 
 const fedopsBundleSize = proxyquire('../index', {
-  'graphite-tcp': {createClient} // eslint-disable-line camelcase
+  'node-fetch': fetchSpy // eslint-disable-line
 });
 
 const APP_NAME = 'your-unique-app-name'; // eslint-disable-line camelcase
@@ -35,6 +29,7 @@ describe('measure bundle size', () => {
   const someOtherFileContent = `console.log('foo bar');`;
   const cssFileContent = `.app {margin: 4px;}`;
   const bundleSize = content => content.length + 1;
+  const reportStoreUrl = 'http://someurl';
   let clock;
   let test;
 
@@ -51,9 +46,30 @@ describe('measure bundle size', () => {
     return fedopsBundleSize(Object.assign({}, defaults, rest));
   };
 
-  const output = (bundleName, fileContent, appName = APP_NAME) => {
-    return `wix-bi-tube.root=events_catalog.src=72.app_name=${appName}.bundle_name=${bundleName}.bundle_size ${bundleSize(fileContent)} host=m.wixpress.com port=2003`;
+  const getFetchArgs = (bundleName, fileContent, appName = APP_NAME) => {
+    return [
+      reportStoreUrl,
+      {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          appName,
+          bundleName,
+          bundleSize: bundleSize(fileContent)
+        })
+      }
+    ];
   };
+
+  before(() => {
+    process.env.FEDOPS_BUILD_REPORT_STORE_URL = reportStoreUrl;
+  });
+
+  after(() => {
+    delete process.env.FEDOPS_BUILD_REPORT_STORE_URL;
+  });
 
   beforeEach(() => {
     test = tp.create();
@@ -63,8 +79,7 @@ describe('measure bundle size', () => {
 
   afterEach(() => {
     test.teardown();
-    graphitePutSpy.reset();
-    graphiteCloseSpy.reset();
+    fetchSpy.reset();
     clock.restore();
   });
 
@@ -75,8 +90,7 @@ describe('measure bundle size', () => {
     });
     const task = createTask({inTeamCity: () => false});
     return task().then(() => {
-      expect(graphitePutSpy).not.to.have.been.called;
-      expect(graphiteCloseSpy).not.to.have.been.called;
+      expect(fetchSpy).not.to.have.been.called;
     });
   });
 
@@ -86,8 +100,7 @@ describe('measure bundle size', () => {
     });
     const task = createTask({inTeamCity: () => false});
     return task().then(() => {
-      expect(graphitePutSpy).not.to.have.been.called;
-      expect(graphiteCloseSpy).not.to.have.been.called;
+      expect(fetchSpy).not.to.have.been.called;
     });
   });
 
@@ -98,9 +111,8 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_js', someFileContent));
+      expect(fetchSpy).to.have.been.calledOnce;
+      expect(fetchSpy).to.have.been.calledWith(...getFetchArgs('app.bundle.min.js', someFileContent));
     });
   });
 
@@ -111,9 +123,8 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_css', cssFileContent));
+      expect(fetchSpy).to.have.been.calledOnce;
+      expect(fetchSpy).to.have.been.calledWith(...getFetchArgs('app.bundle.min.css', cssFileContent));
     });
   });
 
@@ -126,11 +137,10 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledThrice;
-      expect(graphiteCloseSpy).to.have.been.calledThrice;
-      expect(graphitePutSpy.getCall(0).args[0]).to.equal(output('a_bundle_min_css', cssFileContent));
-      expect(graphitePutSpy.getCall(1).args[0]).to.equal(output('a_bundle_min_js', someFileContent));
-      expect(graphitePutSpy.getCall(2).args[0]).to.equal(output('b_bundle_min_js', someOtherFileContent));
+      expect(fetchSpy).to.have.been.calledThrice;
+      expect(fetchSpy.getCall(0).args).to.eql(getFetchArgs('a.bundle.min.css', cssFileContent));
+      expect(fetchSpy.getCall(1).args).to.eql(getFetchArgs('a.bundle.min.js', someFileContent));
+      expect(fetchSpy.getCall(2).args).to.eql(getFetchArgs('b.bundle.min.js', someOtherFileContent));
     });
   });
 
@@ -144,38 +154,9 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledTwice;
-      expect(graphiteCloseSpy).to.have.been.calledTwice;
-      expect(graphitePutSpy.getCall(0).args[0]).to.equal(output('b_bundle_min_css', cssFileContent));
-      expect(graphitePutSpy.getCall(1).args[0]).to.equal(output('b_bundle_min_js', someFileContent));
-    });
-  });
-
-  it('should replace dots with underscore in project name', () => {
-    test.setup({
-      'dist/statics/app.bundle.min.js': someFileContent,
-      'fedops.json': JSON.stringify({
-        app_name: 'proj.with.dots' // eslint-disable-line camelcase
-      }, null, 2)
-    });
-    const task = createTask();
-    return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_js', someFileContent, 'proj_with_dots'));
-    });
-  });
-
-  it('should replace dots with underscore in bundle file name', () => {
-    test.setup({
-      'dist/statics/bundle.with.dots.bundle.min.js': someFileContent,
-      'fedops.json': fedopsJson
-    });
-    const task = createTask();
-    return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('bundle_with_dots_bundle_min_js', someFileContent));
+      expect(fetchSpy).to.have.been.calledTwice;
+      expect(fetchSpy.getCall(0).args).to.eql(getFetchArgs('b.bundle.min.css', cssFileContent));
+      expect(fetchSpy.getCall(1).args).to.eql(getFetchArgs('b.bundle.min.js', someFileContent));
     });
   });
 
@@ -187,10 +168,9 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledTwice;
-      expect(graphiteCloseSpy).to.have.been.calledTwice;
-      expect(graphitePutSpy.getCall(0).args[0]).to.equal(output('a_bundle_min_css', cssFileContent));
-      expect(graphitePutSpy.getCall(1).args[0]).to.equal(output('a_bundle_min_js', someFileContent));
+      expect(fetchSpy).to.have.been.calledTwice;
+      expect(fetchSpy.getCall(0).args).to.eql(getFetchArgs('a.bundle.min.css', cssFileContent));
+      expect(fetchSpy.getCall(1).args).to.eql(getFetchArgs('a.bundle.min.js', someFileContent));
     });
   });
 
@@ -203,12 +183,11 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.callCount(4);
-      expect(graphiteCloseSpy).to.have.callCount(4);
-      expect(graphitePutSpy.getCall(0).args[0]).to.equal(output('a_bundle_min_css', cssFileContent));
-      expect(graphitePutSpy.getCall(1).args[0]).to.equal(output('a_bundle_min_css', cssFileContent, ANOTHER_APP_NAME));
-      expect(graphitePutSpy.getCall(2).args[0]).to.equal(output('a_bundle_min_js', someFileContent));
-      expect(graphitePutSpy.getCall(3).args[0]).to.equal(output('a_bundle_min_js', someFileContent, ANOTHER_APP_NAME));
+      expect(fetchSpy).to.have.been.callCount(4);
+      expect(fetchSpy.getCall(0).args).to.eql(getFetchArgs('a.bundle.min.css', cssFileContent));
+      expect(fetchSpy.getCall(1).args).to.eql(getFetchArgs('a.bundle.min.css', cssFileContent, ANOTHER_APP_NAME));
+      expect(fetchSpy.getCall(2).args).to.eql(getFetchArgs('a.bundle.min.js', someFileContent));
+      expect(fetchSpy.getCall(3).args).to.eql(getFetchArgs('a.bundle.min.js', someFileContent, ANOTHER_APP_NAME));
     });
   });
 
@@ -219,9 +198,8 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_js', someFileContent));
+      expect(fetchSpy).to.have.been.calledOnce;
+      expect(fetchSpy.getCall(0).args).to.eql(getFetchArgs('app.bundle.min.js', someFileContent));
     });
   });
 
@@ -232,8 +210,7 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).not.to.have.been.called;
-      expect(graphiteCloseSpy).not.to.have.been.called;
+      expect(fetchSpy).not.to.have.been.called;
     });
   });
 
@@ -244,9 +221,8 @@ describe('measure bundle size', () => {
     });
     const task = createTask();
     return task().then(() => {
-      expect(graphitePutSpy).to.have.been.calledOnce;
-      expect(graphiteCloseSpy).to.have.been.calledOnce;
-      expect(graphitePutSpy).to.have.been.calledWith(output('app_bundle_min_js', someFileContent));
+      expect(fetchSpy).to.have.been.calledOnce;
+      expect(fetchSpy.getCall(0).args).to.eql(getFetchArgs('app.bundle.min.js', someFileContent));
     });
   });
 });
