@@ -8,6 +8,7 @@ const webpackConfigCommon = require('./webpack.config.common');
 const projectConfig = require('./project');
 const DynamicPublicPath = require('../lib/plugins/dynamic-public-path');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 const {isObject} = require('lodash');
 const defaultCommonsChunkConfig = {
   name: 'commons',
@@ -41,6 +42,8 @@ const config = ({debug, separateCss = projectConfig.separateCss(), analyze, disa
       new webpack.LoaderOptionsPlugin({
         minimize: !debug
       }),
+
+      new DuplicatePackageCheckerPlugin({verbose: true}),
 
       new DynamicPublicPath(),
 
