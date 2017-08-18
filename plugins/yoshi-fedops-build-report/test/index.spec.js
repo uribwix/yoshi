@@ -8,7 +8,7 @@ chai.use(sinonChai);
 const {expect} = chai;
 
 const successfulFetch = true;
-const fetchSpy = sinon.spy(function() {
+const fetchSpy = sinon.spy(function () {
   return new Promise((resolve, reject) => {
     successfulFetch ? resolve({ok: true}) : reject();
   });
