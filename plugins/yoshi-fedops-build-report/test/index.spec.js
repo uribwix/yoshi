@@ -7,11 +7,11 @@ const sinon = require('sinon');
 chai.use(sinonChai);
 const {expect} = chai;
 
+const successfulFetch = true;
 const fetchSpy = sinon.spy(function() {
-  return {
-    then: () => {},
-    catch: () => {}
-  };
+  return new Promise((resolve, reject) => {
+    successfulFetch ? resolve({ok: true}) : reject();
+  });
 });
 
 const fedopsBundleSize = proxyquire('../index', {
