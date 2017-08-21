@@ -14,7 +14,7 @@ let port;
 const defaultPort = Number(process.env.PORT) || 3000;
 
 function writeToServerLog(data) {
-  fs.appendFile('target/server.log', data);
+  fs.appendFile('target/server.log', data, () => {});
 }
 
 const runServer = ({entryPoint, manualRestart}) => {
