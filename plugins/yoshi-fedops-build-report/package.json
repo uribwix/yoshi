@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "glob": "~7.1.2",
-    "graphite-tcp": "~1.0.4",
     "node-fetch": "^1.7.2"
   }
 }
