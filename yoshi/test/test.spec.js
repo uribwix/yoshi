@@ -311,6 +311,32 @@ describe('Aggregator: Test', () => {
       expect(res.stdout).to.contain('2 passing');
     });
 
+    it('should mock image files to always return the file name', function () {
+      this.timeout(30000);
+
+      const extensions = ['png', 'svg', 'jpg', 'jpeg', 'gif'];
+      const setup = setupMediaFilesExtensions(extensions);
+      const res = test
+        .setup(setup)
+        .execute('test', ['--mocha']);
+
+      expect(res.code).to.equal(0);
+      expect(res.stdout).to.contain('5 passing');
+    });
+
+    it('should mock audio files to always return the file name', function () {
+      this.timeout(30000);
+
+      const extensions = ['wav', 'mp3'];
+      const setup = setupMediaFilesExtensions(extensions);
+      const res = test
+        .setup(setup)
+        .execute('test', ['--mocha']);
+
+      expect(res.code).to.equal(0);
+      expect(res.stdout).to.contain('2 passing');
+    });
+
     it('should load graphql files', function () {
       this.timeout(30000);
 
@@ -708,13 +734,13 @@ describe('Aggregator: Test', () => {
     describe('Specs Bundle', () => {
       it('should generate a bundle', () => {
         const res = test
-            .setup({
-              'src/test.spec.js': 'it("pass", function () { expect(1).toBe(1); });',
-              'src/test1.spec.js': 'it("pass", function () { expect(2).toBe(2); });',
-              'karma.conf.js': fx.karmaWithJasmine(),
-              'package.json': fx.packageJson()
-            })
-            .execute('test', ['--karma']);
+          .setup({
+            'src/test.spec.js': 'it("pass", function () { expect(1).toBe(1); });',
+            'src/test1.spec.js': 'it("pass", function () { expect(2).toBe(2); });',
+            'karma.conf.js': fx.karmaWithJasmine(),
+            'package.json': fx.packageJson()
+          })
+          .execute('test', ['--karma']);
 
         expect(res.code).to.equal(0);
         expect(test.content('dist/specs.bundle.js')).to.contain('expect(1).toBe(1);');
@@ -723,18 +749,18 @@ describe('Aggregator: Test', () => {
 
       it('should consider custom specs.browser globs if configured', () => {
         const res = test
-            .setup({
-              'some/other/app.glob.js': 'it("pass", function () { expect(1).toBe(1); });',
-              'some/other/app2.glob.js': 'it("pass", function () { expect(2).toBe(2); });',
-              'karma.conf.js': fx.karmaWithJasmine(),
-              'pom.xml': fx.pom(),
-              'package.json': fx.packageJson({
-                specs: {
-                  browser: 'some/other/*.glob.js'
-                }
-              })
+          .setup({
+            'some/other/app.glob.js': 'it("pass", function () { expect(1).toBe(1); });',
+            'some/other/app2.glob.js': 'it("pass", function () { expect(2).toBe(2); });',
+            'karma.conf.js': fx.karmaWithJasmine(),
+            'pom.xml': fx.pom(),
+            'package.json': fx.packageJson({
+              specs: {
+                browser: 'some/other/*.glob.js'
+              }
             })
-            .execute('test', ['--karma']);
+          })
+          .execute('test', ['--karma']);
 
         expect(res.code).to.equal(0);
         expect(test.content('dist/specs.bundle.js')).to.contain('expect(1).toBe(1);');
@@ -775,7 +801,7 @@ describe('Aggregator: Test', () => {
             'src/foo.css': '@import "bar/bar";',
             'node_modules/bar/bar.scss': '.bar{color:red}',
             'karma.conf.js': fx.karmaWithJasmine(),
-            'package.json': fx.packageJson(),
+            'package.json': fx.packageJson()
           })
           .execute('test', ['--karma']);
 
@@ -790,7 +816,7 @@ describe('Aggregator: Test', () => {
             'karma.conf.js': fx.karmaWithJasmine(),
             'package.json': fx.packageJson({
               tpaStyle: true
-            }),
+            })
           })
           .execute('test', ['--karma']);
         expect(res.code).to.equal(0);
@@ -821,4 +847,21 @@ function passingMochaTest() {
     'src/test.spec.js': `it('should just pass', function () {});`,
     'package.json': fx.packageJson()
   };
+}
+
+function setupMediaFilesExtensions(extensions) {
+  const files = extensions.reduce((result, ext) => {
+    result[`src/some.${ext}`] = '';
+    return result;
+  }, {});
+
+  return Object.assign({}, files, {
+    'src/some.spec.js': `
+      const assert = require('assert');
+      ${extensions
+        .map(ext => `it("pass", () => assert.equal(require('./some.${ext}'), 'some.${ext}'))`)
+        .join(';')}
+    `,
+    'package.json': fx.packageJson()
+  });
 }

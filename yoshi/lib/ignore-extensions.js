@@ -1,5 +1,6 @@
 const fs = require('fs');
 const graphqlLoader = require('graphql-tag/loader');
+const path = require('path');
 
 function conditionedProxy(predicate = () => {}) {
   return new Proxy({}, {
@@ -19,6 +20,10 @@ function loadGraphQLModules(module) {
   module.exports = eval(output); // eslint-disable-line no-eval
 }
 
+function mockMediaModules(module) {
+  module.exports = path.basename(module.filename);
+}
+
 function noop() {}
 
 require.extensions['.css'] = mockCssModules;
@@ -28,10 +33,11 @@ require.extensions['.less'] = mockCssModules;
 require.extensions['.graphql'] = loadGraphQLModules;
 require.extensions['.gql'] = loadGraphQLModules;
 
-require.extensions['.png'] = noop;
-require.extensions['.svg'] = noop;
-require.extensions['.jpg'] = noop;
-require.extensions['.jpeg'] = noop;
-require.extensions['.gif'] = noop;
-require.extensions['.wav'] = noop;
-require.extensions['.mp3'] = noop;
+require.extensions['.png'] = mockMediaModules;
+require.extensions['.svg'] = mockMediaModules;
+require.extensions['.jpg'] = mockMediaModules;
+require.extensions['.jpeg'] = mockMediaModules;
+require.extensions['.gif'] = mockMediaModules;
+
+require.extensions['.wav'] = mockMediaModules;
+require.extensions['.mp3'] = mockMediaModules;
