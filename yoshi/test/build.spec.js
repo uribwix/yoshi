@@ -582,6 +582,61 @@ describe('Aggregator: Build', () => {
       expect(test.list('dist/statics')).to.contain('app.bundle.js');
     });
 
+    describe('moment js', () => {
+      it('should ignore locale modules from within moment if it is enabled', () => {
+        const res = test
+          .setup({
+            'src/client.js': `import 'moment';`,
+            'node_modules/moment/index.js': `function load() {return require('./locale/' + lang);}`,
+            'node_modules/moment/locale/en.js': `module.exports = 'english'`,
+            'package.json': fx.packageJson({
+              optimizeMoment: true
+            }),
+            'pom.xml': fx.pom()
+          })
+          .execute('build');
+
+        expect(res.code).to.equal(0);
+        expect(test.list('dist/statics')).to.contain('app.bundle.js');
+        // expect(test.content('dist/statics/app.bundle.js')).to.contain('moment');
+        expect(test.content('dist/statics/app.bundle.js')).not.to.contain('english');
+      });
+
+      it('should not ignore locale modules from within moment if it is not enabled', () => {
+        const res = test
+          .setup({
+            'src/client.js': `require('moment')`,
+            'node_modules/moment/index.js': `require('./locale/en'); module.exports = 'moment';`,
+            'node_modules/moment/locale/en.js': `module.exports = 'english';`,
+            'package.json': fx.packageJson(),
+            'pom.xml': fx.pom()
+          })
+          .execute('build');
+
+        expect(res.code).to.equal(0);
+        expect(test.list('dist/statics')).to.contain('app.bundle.js');
+        expect(test.content('dist/statics/app.bundle.js')).to.contain('moment');
+        expect(test.content('dist/statics/app.bundle.js')).to.contain('english');
+      });
+
+      it('should bundle locale modules from outside of moment', () => {
+        const res = test
+          .setup({
+            'src/client.js': `require('moment/locale/en')`,
+            'node_modules/moment/locale/en.js': `module.exports = 'english';`,
+            'package.json': fx.packageJson({
+              optimizeMoment: true
+            }),
+            'pom.xml': fx.pom()
+          })
+          .execute('build');
+
+        expect(res.code).to.equal(0);
+        expect(test.list('dist/statics')).to.contain('app.bundle.js');
+        expect(test.content('dist/statics/app.bundle.js')).to.contain('english');
+      });
+    });
+
     it('should generate a minified bundle on ci', () => {
       const res = test
         .setup({

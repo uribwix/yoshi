@@ -21,6 +21,7 @@ module.exports = {
     node: () => getConfig('specs.node'),
     browser: () => getConfig('specs.browser')
   },
+  optimizeMoment: () => getConfig('optimizeMoment', false),
   exports: () => getConfig('exports'),
   clientProjectName: () => getConfig('clientProjectName'),
   clientFilesPath: () => {

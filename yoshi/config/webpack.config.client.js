@@ -17,6 +17,7 @@ const defaultCommonsChunkConfig = {
 
 const config = ({debug, separateCss = projectConfig.separateCss(), analyze, disableModuleConcatenation} = {}) => {
   const disableModuleConcat = process.env.DISABLE_MODULE_CONCATENATION === 'true' || disableModuleConcatenation;
+  const optimizeMoment = projectConfig.optimizeMoment();
   const projectName = projectConfig.name();
   const cssModules = projectConfig.cssModules();
   const tpaStyle = projectConfig.tpaStyle();
@@ -36,6 +37,7 @@ const config = ({debug, separateCss = projectConfig.separateCss(), analyze, disa
 
     plugins: [
       ...disableModuleConcat ? [] : [new webpack.optimize.ModuleConcatenationPlugin()],
+      ...optimizeMoment ? [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)] : [],
       ...analyze ? [new BundleAnalyzerPlugin()] : [],
       ...useCommonsChunk ? [new webpack.optimize.CommonsChunkPlugin(commonsChunkConfig)] : [],
 
