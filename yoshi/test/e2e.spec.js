@@ -149,12 +149,26 @@ describe('Aggregator: e2e', () => {
   it('should extend project\'s beforeLaunch', function () {
     this.timeout(60000);
     const res = test
-    .setup(singleModuleWithBeforLaunch(), [hooks.installProtractor])
+    .setup(singleModuleWithBeforeLaunch(), [hooks.installProtractor])
     .execute('test', ['--protractor'], outsideTeamCity);
 
     expect(res.code).to.equal(0);
     expect(res.stdout).to.contain('protractor');
     expect(res.stdout).to.contain('1 spec, 0 failures');
+  });
+
+  it('should extend project\'s afterLaunch', function () {
+    this.timeout(60000);
+    const res = test
+      .setup({
+        'dist/test/some.e2e.js': `it('some test', () => {})`,
+        'package.json': fx.packageJson(),
+        'protractor.conf.js': fx.protractorConfWithAfterLaunch()
+      }, [hooks.installProtractor])
+      .execute('test', ['--protractor'], outsideTeamCity);
+
+    expect(res.code).to.equal(0);
+    expect(res.stdout).to.contain('afterLaunch hook');
   });
 
   function cdnConfigurations() {
@@ -247,7 +261,7 @@ describe('Aggregator: e2e', () => {
     };
   }
 
-  function singleModuleWithBeforLaunch() {
+  function singleModuleWithBeforeLaunch() {
     return Object.assign(singleModuleWithJasmine(), {
       'protractor.conf.js': fx.protractorConfWithBeforeLaunch()
     });
