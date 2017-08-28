@@ -18,7 +18,7 @@ describe('features', () => {
   });
 
   describe('add stories to base glob', () => {
-    const deprecationMessageStart = 'DEPRECATED: Please enable addStoriesToBaseGlobin';
+    const deprecationMessageStart = 'DEPRECATED: Please enable addStoriesToBaseGlob';
 
     describe('when package.json flag configured and you have stories directory', () => {
       beforeEach(() => {
@@ -36,6 +36,11 @@ describe('features', () => {
 
       it('should not warn on build command', () => {
         res = test.execute('build');
+        expect(res.stdout).to.not.contain(deprecationMessageStart);
+      });
+
+      it('should not warn on lint command', () => {
+        res = test.execute('lint');
         expect(res.stdout).to.not.contain(deprecationMessageStart);
       });
     });
