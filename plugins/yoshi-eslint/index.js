@@ -14,7 +14,7 @@ module.exports = ({logIf, base}) => {
       const formatter = cli.getFormatter();
       logIfAny(formatter(report.results));
       const errors = CLIEngine.getErrorResults(report.results);
-      return errors.length ? reject(errors) : resolve();
+      return errors.length ? reject() : resolve();
     });
   }
 
