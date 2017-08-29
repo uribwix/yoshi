@@ -178,6 +178,7 @@ yoshi: {
 
 Flag | Short Flag | Description
 ---- | ---------- | -----------
+--fix | | Automatically fix lint problems (works only for eslint)
 
 Executes `TSLint` or `ESLint` (depending on the type of the project) over all matched files. An '.eslintrc' / `tslint.json` file with proper configurations is required.
 
