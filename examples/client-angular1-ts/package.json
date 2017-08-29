@@ -30,6 +30,7 @@
     "react-addons-test-utils": "~15.6.0",
     "require-reload": "~0.2.2",
     "turnerjs": "~1.0.256",
+    "typescript": "~2.3.0",
     "velocity": "~0.7.2",
     "yoshi": "latest"
   },
