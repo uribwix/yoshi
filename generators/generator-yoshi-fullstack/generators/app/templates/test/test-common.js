@@ -1,1 +1,1 @@
-export const getTestBaseUrl = () => `http://localhost:3100`;
+export const testBaseUrl = `http://localhost:3100`;

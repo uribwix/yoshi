@@ -1,10 +1,10 @@
 import {expect} from 'chai';
 import axios from 'axios';
-import {getTestBaseUrl} from '../test-common';
+import {testBaseUrl} from '../test-common';
 import {beforeAndAfter} from '../environment';
 
 const axiosInstance = axios.create({
-  baseURL: getTestBaseUrl(),
+  baseURL: testBaseUrl,
   adapter: require('axios/lib/adapters/http')
 });
 
