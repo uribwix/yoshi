@@ -4,6 +4,14 @@ const tp = require('./helpers/test-phases');
 const fx = require('./helpers/fixtures');
 const retryPromise = require('retry-promise').default;
 
+function checkStdout(test, str) {
+  return retryPromise({backoff: 100}, () =>
+    test.stdout.indexOf(str) > -1 ?
+      Promise.resolve() :
+      Promise.reject()
+  );
+}
+
 describe('features', () => {
   let test, child, res;
 
@@ -15,6 +23,54 @@ describe('features', () => {
   afterEach(() => {
     test.teardown();
     return killSpawnProcessAndHisChildren(child);
+  });
+
+  describe('warn if not optimize moment', () => {
+    const warningMessageStart = 'WARNING: Please enable moment.js optimization';
+
+    describe('when the flag is not configured and you have moment in your bundle', () => {
+      beforeEach(() => {
+        test.setup({
+          'src/client.js': `import moment from 'moment';`,
+          'node_modules/moment/moment.js': `module.export = 'moment';`,
+          'node_modules/moment/package.json': JSON.stringify({
+            main: 'moment.js'
+          }),
+          'package.json': fx.packageJson()
+        });
+      });
+
+      it('should show warning message on build command', () => {
+        res = test.execute('build');
+        expect(res.stdout).to.contain(warningMessageStart);
+      });
+    });
+
+    it(`should not show message when you don't have moment in your bundle`, () => {
+      test.setup({
+        'src/client.js': `console.log('hello')`,
+        'package.json': fx.packageJson()
+      });
+
+      res = test.execute('build');
+      expect(res.stdout).to.not.contain(warningMessageStart);
+    });
+
+    it(`should not show message when the flag is configured`, () => {
+      test.setup({
+        'src/client.js': `import moment from 'moment';`,
+        'node_modules/moment/moment.js': `module.exports = 'moment';`,
+        'node_modules/moment/package.json': JSON.stringify({
+          main: 'moment.js'
+        }),
+        'package.json': fx.packageJson({
+          optimizeMoment: true
+        })
+      });
+
+      res = test.execute('build');
+      expect(res.stdout).to.not.contain(warningMessageStart);
+    });
   });
 
   describe('add stories to base glob', () => {
@@ -80,16 +136,8 @@ describe('features', () => {
 
       it('should warn on start command', () => {
         child = test.spawn('start');
-        return checkStdout(deprecationMessageStart);
+        return checkStdout(test, deprecationMessageStart);
       });
     });
-
-    function checkStdout(str) {
-      return retryPromise({backoff: 100}, () =>
-        test.stdout.indexOf(str) > -1 ?
-          Promise.resolve() :
-          Promise.reject()
-      );
-    }
   });
 });

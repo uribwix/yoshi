@@ -22,8 +22,6 @@ To avoid breaking existing projects, we're will only do the previous optimizatio
 }
 ```
 
-***Please enable it and adjust your code, because those changes will be applied to all projects soon.***
+***Please enable it and adjust your code, because those changes will be applied to all projects on **`24 September 2017`**.***
 
 You can read more about it here: https://github.com/jmblog/how-to-optimize-momentjs-with-webpack/blob/master/README.md
-
-
