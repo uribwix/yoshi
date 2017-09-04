@@ -21,7 +21,7 @@ module.exports['depcheck'] = () => start(depcheck({ignoreMatches: ['wnpm-ci']}))
 
 
 module.exports.sync = () => start(
-  dependencies.sync(),
+  // dependencies.sync(),
   module.exports.relock
   /*modules.sync(),
    dependencies.unmanaged(),
