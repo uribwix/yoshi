@@ -92,8 +92,18 @@ module.exports.clean = () => start(
 module.exports.relock = () => start(
   startTasks.log('Resetting yarn.lock files'),
   startModulesTasks.modules.load(),
-  startModulesTasks.iter.async()((module, input, asyncReporter) => Start(asyncReporter)(
-    startModulesTasks.module.exec(module)('rm -f yarn.lock && touch yarn.lock')
-    )
+  startModulesTasks.iter.async()((module, input, asyncReporter) => {
+    if (ignoreRelock(module)) {
+      return Promise.resolve();
+    }
+
+    return Start(asyncReporter)(
+        startModulesTasks.module.exec(module)('rm -f yarn.lock && touch yarn.lock')
+      )
+    }
   )
 )
+
+function ignoreRelock(module) {
+  return module.relativePath.indexOf('examples/auto-generated') === 0;
+}
