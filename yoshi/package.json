@@ -82,7 +82,7 @@
     "style-loader": "~0.18.2",
     "svg-inline-loader": "~0.8.0",
     "ts-loader": "~2.3.0",
-    "ts-node": "~1.7.3",
+    "ts-node": "~3.3.0",
     "tslint": "~5.5.0",
     "tslint-config-wix": "~1.0.23",
     "url-loader": "~0.5.9",
