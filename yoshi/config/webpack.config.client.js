@@ -8,13 +8,16 @@ const webpackConfigCommon = require('./webpack.config.common');
 const projectConfig = require('./project');
 const DynamicPublicPath = require('../lib/plugins/dynamic-public-path');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 const {isObject} = require('lodash');
 const defaultCommonsChunkConfig = {
   name: 'commons',
   minChunks: 2
 };
 
-const config = ({debug, separateCss = projectConfig.separateCss(), analyze} = {}) => {
+const config = ({debug, separateCss = projectConfig.separateCss(), analyze, disableModuleConcatenation} = {}) => {
+  const disableModuleConcat = process.env.DISABLE_MODULE_CONCATENATION === 'true' || disableModuleConcatenation;
+  const optimizeMoment = projectConfig.optimizeMoment();
   const projectName = projectConfig.name();
   const cssModules = projectConfig.cssModules();
   const tpaStyle = projectConfig.tpaStyle();
@@ -33,13 +36,16 @@ const config = ({debug, separateCss = projectConfig.separateCss(), analyze} = {}
     },
 
     plugins: [
+      ...disableModuleConcat ? [] : [new webpack.optimize.ModuleConcatenationPlugin()],
+      ...optimizeMoment ? [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)] : [],
       ...analyze ? [new BundleAnalyzerPlugin()] : [],
-
       ...useCommonsChunk ? [new webpack.optimize.CommonsChunkPlugin(commonsChunkConfig)] : [],
 
       new webpack.LoaderOptionsPlugin({
         minimize: !debug
       }),
+
+      new DuplicatePackageCheckerPlugin({verbose: true}),
 
       new DynamicPublicPath(),
 

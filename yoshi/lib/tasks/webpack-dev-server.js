@@ -9,7 +9,7 @@ const {shouldRunWebpack, filterNoise} = require('../utils');
 const {start} = require('../server-api');
 
 function webpackDevServer() {
-  const webpackConfig = getConfig({debug: true});
+  const webpackConfig = getConfig({debug: true, disableModuleConcatenation: true});
 
   let middlewares = [];
 

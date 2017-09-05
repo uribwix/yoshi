@@ -30,7 +30,12 @@ module.exports = function (wallaby) {
     ],
 
     compilers: {
-      '**/*.js{,x}': wallaby.compilers.babel()
+      '**/*.js{,x}': wallaby.compilers.babel({
+        babelrc: true,
+        plugins: [
+          require.resolve('babel-plugin-transform-es2015-modules-commonjs')
+        ]
+      })
     },
 
     env: {

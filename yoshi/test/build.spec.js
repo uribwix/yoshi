@@ -32,7 +32,6 @@ describe('Aggregator: Build', () => {
           'package.json': fx.packageJson()
         })
         .execute('build');
-
       expect(resp.code).to.equal(0);
       expect(resp.stdout).to.contain(`Finished 'sass'`);
       expect(test.content('dist/app/a/style.scss')).to.contain(compiledStyle);
@@ -58,7 +57,7 @@ describe('Aggregator: Build', () => {
   describe('with --analyze flag', () => {
     it('should serve webpack-bundle-analyzer server', () => {
       const analyzerServerPort = '8888';
-      const analyzerContentPart = 'window.chartData = [{"label":"app.bundle.js"';
+      const analyzerContentPart = 'window.chartData = [{"label":"app.bundle.min.js"';
 
       test
         .setup({
@@ -404,9 +403,9 @@ describe('Aggregator: Build', () => {
           'pom.xml': fx.pom()
         })
         .execute('build');
-
       expect(res.code).to.equal(1);
-      expect(res.stdout).to.contain('Unexpected token (2:0)');
+      expect(res.stdout).to.contain('Module build failed:');
+      expect(res.stderr).to.contain('Unexpected token (2:0)');
     });
 
     it('should generate a bundle using different entry', () => {
@@ -583,6 +582,61 @@ describe('Aggregator: Build', () => {
       expect(test.list('dist/statics')).to.contain('app.bundle.js');
     });
 
+    describe('moment js', () => {
+      it('should ignore locale modules from within moment if it is enabled', () => {
+        const res = test
+          .setup({
+            'src/client.js': `import 'moment';`,
+            'node_modules/moment/index.js': `function load() {return require('./locale/' + lang);}`,
+            'node_modules/moment/locale/en.js': `module.exports = 'english'`,
+            'package.json': fx.packageJson({
+              optimizeMoment: true
+            }),
+            'pom.xml': fx.pom()
+          })
+          .execute('build');
+
+        expect(res.code).to.equal(0);
+        expect(test.list('dist/statics')).to.contain('app.bundle.js');
+        // expect(test.content('dist/statics/app.bundle.js')).to.contain('moment');
+        expect(test.content('dist/statics/app.bundle.js')).not.to.contain('english');
+      });
+
+      it('should not ignore locale modules from within moment if it is not enabled', () => {
+        const res = test
+          .setup({
+            'src/client.js': `require('moment')`,
+            'node_modules/moment/index.js': `require('./locale/en'); module.exports = 'moment';`,
+            'node_modules/moment/locale/en.js': `module.exports = 'english';`,
+            'package.json': fx.packageJson(),
+            'pom.xml': fx.pom()
+          })
+          .execute('build');
+
+        expect(res.code).to.equal(0);
+        expect(test.list('dist/statics')).to.contain('app.bundle.js');
+        expect(test.content('dist/statics/app.bundle.js')).to.contain('moment');
+        expect(test.content('dist/statics/app.bundle.js')).to.contain('english');
+      });
+
+      it('should bundle locale modules from outside of moment', () => {
+        const res = test
+          .setup({
+            'src/client.js': `require('moment/locale/en')`,
+            'node_modules/moment/locale/en.js': `module.exports = 'english';`,
+            'package.json': fx.packageJson({
+              optimizeMoment: true
+            }),
+            'pom.xml': fx.pom()
+          })
+          .execute('build');
+
+        expect(res.code).to.equal(0);
+        expect(test.list('dist/statics')).to.contain('app.bundle.js');
+        expect(test.content('dist/statics/app.bundle.js')).to.contain('english');
+      });
+    });
+
     it('should generate a minified bundle on ci', () => {
       const res = test
         .setup({
@@ -629,34 +683,6 @@ describe('Aggregator: Build', () => {
 
       expect(res.code).to.equal(0);
       expect(test.list('dist/statics')).not.to.contain('app.bundle.js');
-    });
-
-    it('should not generate a minified version and instead copy the normal bundle inside of TeamCity', () => {
-      const res = test
-        .setup({
-          'src/client.js': `const aFunction = require('./dep');const a = aFunction(1);`,
-          'src/dep.js': `module.exports = function(a){return a + 1;};`,
-          'package.json': fx.packageJson(),
-          'pom.xml': fx.pom()
-        })
-        .execute('build', [], outsideTeamCity);
-
-      expect(res.code).to.equal(0);
-      expect(test.content('dist/statics/app.bundle.js')).to.eql(test.content('dist/statics/app.bundle.min.js'));
-    });
-
-    it('should generate a minified version inside of TeamCity', () => {
-      const res = test
-        .setup({
-          'src/client.js': `const aFunction = require('./dep');const a = aFunction(1);`,
-          'src/dep.js': `module.exports = function(a){return a + 1;};`,
-          'package.json': fx.packageJson(),
-          'pom.xml': fx.pom()
-        })
-        .execute('build', [], insideTeamCity);
-
-      expect(res.code).to.equal(0);
-      expect(test.content('dist/statics/app.bundle.js')).not.to.eql(test.content('dist/statics/app.bundle.min.js'));
     });
   });
 

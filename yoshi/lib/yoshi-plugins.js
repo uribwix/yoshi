@@ -23,14 +23,14 @@ function tests(options) {
 
 module.exports = options => ({
   build: [
-    ['yoshi-clean', 'yoshi-update-node-version'],
+    ['yoshi-clean', 'yoshi-update-node-version', './tasks/warn-add-stories-to-base-glob'],
     ['yoshi-sass', './tasks/less', 'yoshi-petri', 'yoshi-maven-statics', 'yoshi-copy', transpiler(), './tasks/bundle'],
-    ['yoshi-fedops-build-report']
+    ['yoshi-fedops-build-report', './tasks/warn-moment-optimize']
   ],
-  lint: [[linter, 'yoshi-stylelint']],
+  lint: [[linter, 'yoshi-stylelint', './tasks/warn-add-stories-to-base-glob']],
   release: [['yoshi-wnpm-release']],
   start: [
-    ['yoshi-clean', 'yoshi-update-node-version'],
+    ['yoshi-clean', 'yoshi-update-node-version', './tasks/warn-add-stories-to-base-glob'],
     ['yoshi-sass', './tasks/less', 'yoshi-petri', 'yoshi-maven-statics', 'yoshi-copy', transpiler(), './tasks/webpack-dev-server']
   ],
   test: tests(options)

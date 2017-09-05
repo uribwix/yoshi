@@ -9,8 +9,9 @@
   "scripts": {
     "postinstall": "npm install --silent --prefix private screenshot-reporter-env wix-eyes-env || true",
     "build": ":",
+    "lint": "eslint .",
     "test": "mocha './test/{,!(fixtures)/**/}/*.spec.js'",
-    "posttest": "eslint .",
+    "posttest": "npm run lint",
     "release": "wnpm-release --no-shrinkwrap"
   },
   "bin": {
@@ -35,8 +36,8 @@
     "commander": "~2.11.0",
     "cross-spawn": "~5.1.0",
     "css-loader": "~0.28.4",
-    "css-modules-require-hook": "~4.0.6",
     "detect-port": "~1.2.1",
+    "duplicate-package-checker-webpack-plugin": "~1.2.5",
     "eslint-config-wix": "~1.1.14",
     "express": "~4.15.3",
     "extract-text-webpack-plugin": "~3.0.0",
@@ -47,6 +48,7 @@
     "gulp": "~3.9.1",
     "gulp-util": "~3.0.8",
     "gulp-watch": "~4.3.11",
+    "happypack": "3.0.2",
     "html-loader": "~0.4.5",
     "jasmine": "~2.6.0",
     "jasmine-reporters": "~2.2.0",
@@ -75,15 +77,14 @@
     "resolve-url-loader": "~2.1.0",
     "sass-loader": "~6.0.6",
     "screenshot-reporter": "~1.1.3",
-    "stylable": "^2.0.4",
-    "stylable-integration": "3.0.6",
+    "stylable": "4.0.7",
+    "stylable-integration": "5.0.0",
     "style-loader": "~0.18.2",
     "svg-inline-loader": "~0.8.0",
     "ts-loader": "~2.3.0",
-    "ts-node": "~1.7.3",
+    "ts-node": "~3.3.0",
     "tslint": "~5.5.0",
     "tslint-config-wix": "~1.0.23",
-    "typescript": "~2.3.0",
     "url-loader": "~0.5.9",
     "webpack": "~3.2.0",
     "webpack-bundle-analyzer": "~2.8.3",
@@ -116,7 +117,11 @@
     "ps-tree": "~1.1.0",
     "retry-promise": "~1.0.0",
     "shelljs": "~0.7.8",
+    "typescript": "~2.3.0",
     "wnpm-ci": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^2.3.0"
   },
   "eslintConfig": {
     "extends": "wix",

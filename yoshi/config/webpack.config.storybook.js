@@ -14,5 +14,10 @@ module.exports = config => {
     ...require('../lib/loaders/stylable')(false, cssModules, false).client
   ];
 
+  config.plugins = [
+    ...config.plugins || [],
+    require('../lib/plugins/babelHappyPack')()
+  ];
+
   return config;
 };

@@ -1,12 +1,12 @@
 'use strict';
 
 const path = require('path');
-const webpack = require('webpack');
 const context = path.resolve('./src');
 const projectConfig = require('./project');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
-const disableModuleConcatenation = process.env.DISABLE_MODULE_CONCATENATION === 'true';
+const StylablePlugin = require('stylable-integration/webpack-plugin');
+const stylableOptions = {injectFileCss: true};
 
 const config = {
   context,
@@ -27,13 +27,14 @@ const config = {
   },
 
   plugins: [
-    ...disableModuleConcatenation ? [] : [new webpack.optimize.ModuleConcatenationPlugin()],
-    new CaseSensitivePathsPlugin()
+    new CaseSensitivePathsPlugin(),
+    require('../lib/plugins/babelHappyPack')(projectConfig.isAngularProject()),
+    new StylablePlugin(stylableOptions)
   ],
 
   module: {
     rules: [
-      require('../lib/loaders/babel')(projectConfig.isAngularProject()),
+      require('../lib/loaders/babel')(),
       require('../lib/loaders/typescript')(projectConfig.isAngularProject()),
       require('../lib/loaders/graphql')(),
       require('../lib/loaders/assets')(),

@@ -7,7 +7,7 @@ const toPairs = require('lodash.topairs');
 const noop = () => {};
 
 const typescriptSuccessRegex = /Compilation complete/;
-const typescriptErrorRegex = /\(\d+,\d+\): error TS\d+:/;
+const typescriptErrorRegex = /error TS\d+:/;
 
 function onStdout(resolve, reject) {
   return buffer => {
@@ -15,11 +15,11 @@ function onStdout(resolve, reject) {
       .split('\n')
       .filter(a => a.length > 0);
 
-    const error = lines.some(line => typescriptErrorRegex.test(line));
+    const errors = lines.some(line => typescriptErrorRegex.test(line));
 
     print(lines);
 
-    if (error) {
+    if (errors) {
       return reject();
     }
 
@@ -61,7 +61,7 @@ module.exports = ({log, watch}) => {
 
     return new Promise((resolve, reject) => {
       if (watch) {
-        child.stdout.on('data', onStdout(done));
+        child.stdout.on('data', onStdout(done, noop));
         return resolve();
       }
 

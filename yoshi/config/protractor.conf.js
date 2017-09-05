@@ -1,9 +1,8 @@
 'use strict';
 
 const sass = require('node-sass');
-const projectConfig = require('./project');
 const {tryRequire} = require('../lib/utils');
-const {cssModulesPattren} = require('yoshi-runtime');
+const {wixCssModulesRequireHook} = require('yoshi-runtime');
 
 //Private wix applitools key
 //skip wix' key for applitools
@@ -42,13 +41,7 @@ const merged = ld.mergeWith({
 
   beforeLaunch: () => {
     const rootDir = './src';
-    require('css-modules-require-hook')({
-      rootDir,
-      generateScopedName: cssModulesPattren(),
-      extensions: ['.scss', '.css'],
-      hashPrefix: projectConfig.name(),
-      camelCase: true,
-
+    wixCssModulesRequireHook(rootDir, {
       preprocessCss: (data, file) => sass.renderSync({
         data,
         file,
@@ -84,7 +77,7 @@ const merged = ld.mergeWith({
     if (cdnServer) {
       cdnServer.close();
     }
-    afterLaunch(merged);
+    return afterLaunch.call(merged);
   },
   mochaOpts: {
     timeout: 30000
