@@ -697,7 +697,7 @@ describe('Aggregator: Test', () => {
         expect(res.code).to.equal(0);
         expect(res.stdout)
           .to.contain(`Finished 'karma'`)
-          .and.contain('##teamcity[testStarted name=\'should just pass\']');
+          .and.contain('##teamcity[testStarted name=\'should just pass\'');
       });
     });
 
