@@ -35,11 +35,9 @@ class Test {
         const env = Object.assign({}, this.env, environment);
         this.child = spawn('node', [`${this.script}`, `${command}`].concat(options), {cwd: this.tmp, env});
         this.child.stdout.on('data', buffer => {
-          console.log(buffer.toString());
           this.stdout += buffer.toString();
         });
         this.child.stderr.on('data', buffer => {
-          console.log(buffer.toString());
           this.stderr += buffer.toString();
         });
         return this.child;
@@ -54,7 +52,7 @@ class Test {
   execute(command, cliArgs = [], environment = {}, execOptions = {}) {
     const args = [command].concat(cliArgs).join(' ');
     const env = Object.assign({}, this.env, environment);
-    const options = Object.assign({}, {cwd: this.tmp, env, silent: false}, execOptions);
+    const options = Object.assign({}, {cwd: this.tmp, env, silent: true}, execOptions);
 
     if (this.hasTmp()) {
       return sh.exec(`node '${this.script}' ${args}`, options);
