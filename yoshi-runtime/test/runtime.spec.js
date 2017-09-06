@@ -143,7 +143,7 @@ describe('CSS modules runtime', () => {
           'dist/src/styles/my-file.css': `.a {color: red;}`,
           'package.json': '{"name": "pkg"}'
         })
-      .execute('', [], {NODE_ENV: 'production', LONG_CSS_PATTERN: true});
+        .execute('', [], {NODE_ENV: 'production', LONG_CSS_PATTERN: true});
 
       expect(res.code).to.equal(0);
       expect(res.stdout).to.equal(expectedCssMap);

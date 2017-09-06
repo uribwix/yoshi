@@ -20,13 +20,13 @@ module.exports = ({logIfP, base}) => {
           ],
           formatter: 'string'
         })
-        .then(({output, errored}) => {
-          console.log(output);
+          .then(({output, errored}) => {
+            console.log(output);
 
-          if (errored) {
-            return Promise.reject();
-          }
-        });
+            if (errored) {
+              return Promise.reject();
+            }
+          });
       }
     });
   }

@@ -29,9 +29,9 @@ describe('generator-yoshi', function () {
       prompts.clientProjectsType,
       prompts.preprocessor
     ]
-    .filter(_.identity)
-    .join('-')
-    .replace(/\s/g, '-');
+      .filter(_.identity)
+      .join('-')
+      .replace(/\s/g, '-');
 
     const outputDir = path.join(outputFolder, normalizedName);
 

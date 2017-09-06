@@ -27,7 +27,7 @@
     "yoshi-wnpm-release": "latest"
   },
   "devDependencies": {
-    "eslint": "~3.19.0",
+    "eslint": "~4.6.1",
     "eslint-config-wix": "~1.1.14",
     "wnpm-ci": "latest"
   },

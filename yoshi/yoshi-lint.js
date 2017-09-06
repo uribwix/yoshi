@@ -11,7 +11,7 @@ const run = require('./lib/run');
 
 program
   .option('--fix', 'Automatically fix lint problems')
-	.parse(process.argv);
+  .parse(process.argv);
 
 const {lint} = require('./lib/yoshi-plugins')(program);
 run(lint, program);

@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "chai": "~3.5.0",
-    "eslint": "~3.19.0",
+    "eslint": "~4.6.1",
     "eslint-config-wix": "~1.1.14",
     "intercept-stdout": "~0.1.2",
     "mocha": "~3.4.2",
