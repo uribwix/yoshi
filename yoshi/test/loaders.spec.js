@@ -292,42 +292,35 @@ describe('Loaders', () => {
   });
 
   describe('Resolve url loader', () => {
-    describe('with RESOLVE_URL_LOADER env variable', () => {
-      it('should resolve relative paths in url() statements based on the original source file', () => {
-        const res = setup().execute('build', [], {RESOLVE_URL_LOADER: true});
-        expect(res.code).to.equal(0);
-      });
-
-      it('should run after wix-tpa-style loader', () => {
-        const res = test
-          .setup({
-            'src/client.js': `require('./some-css.scss');`,
-            'src/some-css.scss': '.foo {color: unquote("{{color-1}}")}',
-            'package.json': fx.packageJson({tpaStyle: true}),
-          })
-          .execute('build', [], {RESOLVE_URL_LOADER: true});
-
-        expect(res.code).to.equal(0);
-      });
-
-      it('should increase importLoaders in order to support native @import', () => {
-        test
-          .setup({
-            'src/client.js': `require('./some.css');`,
-            'src/some.css': '@import "./other.css"',
-            'src/other.css': '.foo {appearance: smth; color: unquote("{{color-1}}")}',
-            'package.json': fx.packageJson({tpaStyle: true}),
-          })
-          .execute('build', [], {RESOLVE_URL_LOADER: true});
-
-        expect(test.content('dist/statics/app.css')).to.contain('-webkit-appearance');
-        expect(test.content('dist/statics/app.css')).to.not.contain('unquote("{{color-1}}")');
-      });
+    it('should resolve relative paths in url() statements based on the original source file', () => {
+      const res = setup().execute('build', []);
+      expect(res.code).to.equal(0);
     });
 
-    it('should not resolve url() correctly without RESOLVE_URL_LOADER flag', () => {
-      const res = setup().execute('build');
-      expect(res.code).to.equal(1);
+    it('should run after wix-tpa-style loader', () => {
+      const res = test
+        .setup({
+          'src/client.js': `require('./some-css.scss');`,
+          'src/some-css.scss': '.foo {color: unquote("{{color-1}}")}',
+          'package.json': fx.packageJson({tpaStyle: true}),
+        })
+        .execute('build', []);
+
+      expect(res.code).to.equal(0);
+    });
+
+    it('should increase importLoaders in order to support native @import', () => {
+      test
+        .setup({
+          'src/client.js': `require('./some.css');`,
+          'src/some.css': '@import "./other.css"',
+          'src/other.css': '.foo {appearance: smth; color: unquote("{{color-1}}")}',
+          'package.json': fx.packageJson({tpaStyle: true}),
+        })
+        .execute('build', []);
+
+      expect(test.content('dist/statics/app.css')).to.contain('-webkit-appearance');
+      expect(test.content('dist/statics/app.css')).to.not.contain('unquote("{{color-1}}")');
     });
 
     function setup() {
