@@ -85,14 +85,15 @@ Flag | Short Flag | Description | Default Value
 
 This will run the specified (server) `entryPoint` file and mount a CDN server.
 
-The following are the default values for the CDN server's port and the mount directory. You can change them in your `package.json`:
+The following are the default values for the CDN server's port, mount directory and whether to serve statics over https or regular http. You can change them in your `package.json`:
 
 ```json
 "yoshi": {
   "servers": {
     "cdn": {
       "port": 3200,
-      "dir": "dist/statics"
+      "dir": "dist/statics",
+      "ssl": false
     }
   }
 }
