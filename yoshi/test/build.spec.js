@@ -309,9 +309,10 @@ describe('Aggregator: Build', () => {
     });
 
     it('should add commons.css if there is any common css/scss required, the common css should be in the commons.css chunk while not in the other chunks', () => {
+      const commonChunk = 'background: red;';
       const res = test
         .setup({
-          'src/styles.scss': `body { background: red; }`,
+          'src/styles.scss': `body { ${commonChunk} }`,
           'src/first.scss': `div { background: blue; }`,
           'src/second.scss': `div { background: yellow; }`,
           'src/app1.js': `const thisIsWorks = true; require('./first.scss'); require('./styles.scss');`,
@@ -326,15 +327,16 @@ describe('Aggregator: Build', () => {
           'pom.xml': fx.pom()
         })
         .execute('build');
+
       expect(res.code).to.equal(0);
       expect(test.list('dist/statics')).to.contain('first.css');
       expect(test.list('dist/statics')).to.contain('second.css');
       expect(test.list('dist/statics')).to.contain('commons.css');
       expect(test.list('dist/statics')).to.contain('commons.min.css');
       expect(test.list('dist/statics')).to.contain('commons.css.map');
-      expect(test.content('dist/statics/commons.css')).to.contain('body {\n  background: red; }');
-      expect(test.content('dist/statics/first.css')).to.not.contain('body {\n  background: red; }');
-      expect(test.content('dist/statics/second.css')).to.not.contain('body {\n  background: red; }');
+      expect(test.content('dist/statics/commons.css')).to.contain(commonChunk);
+      expect(test.content('dist/statics/first.css')).to.not.contain(commonChunk);
+      expect(test.content('dist/statics/second.css')).to.not.contain(commonChunk);
     });
 
     it('should pass a custom configuration if an object is passed to the commonsChunk configuration', () => {
@@ -768,18 +770,19 @@ describe('Aggregator: Build', () => {
     });
 
     it('should separate Css from bundle', () => {
+      const css = 'color: red;';
       const res = test
         .setup({
           'src/client.js': 'require(\'./style.scss\');',
-          'src/style.scss': `.a {.b {color: red;}}`,
+          'src/style.scss': `.a {${css}}`,
           'package.json': fx.packageJson(),
           'pom.xml': fx.pom()
         })
         .execute('build');
 
       expect(res.code).to.equal(0);
-      expect(test.content('dist/statics/app.bundle.js')).not.to.contain('{\n  color: red; }');
-      expect(test.content('dist/statics/app.css')).to.contain('{\n  color: red; }');
+      expect(test.content('dist/statics/app.bundle.js')).not.to.contain(css);
+      expect(test.content('dist/statics/app.css')).to.contain(css);
     });
 
     it('should create a separate css file for each entry', () => {
