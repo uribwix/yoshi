@@ -770,7 +770,7 @@ describe('Aggregator: Build', () => {
     });
 
     it('should separate Css from bundle', () => {
-      const css = 'color: red;';
+      const css = 'color: yellow;';
       const res = test
         .setup({
           'src/client.js': 'require(\'./style.scss\');',
