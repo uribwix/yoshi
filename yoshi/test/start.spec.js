@@ -9,6 +9,7 @@ const fetch = require('node-fetch');
 const retryPromise = require('retry-promise').default;
 const {outsideTeamCity} = require('./helpers/env-variables');
 const {readFileSync} = require('fs');
+const https = require('https');
 
 describe('Aggregator: Start', () => {
   let test, child;
@@ -188,6 +189,25 @@ describe('Aggregator: Start', () => {
         return fetchCDN().then(res => {
           expect(res.headers.get('Access-Control-Allow-Methods')).to.equal('GET, OPTIONS');
           expect(res.headers.get('Access-Control-Allow-Origin')).to.equal('*');
+        });
+      });
+
+      describe('HTTPS', () => {
+        it('should be able to create an https server', () => {
+          child = test
+          .setup({
+            'src/assets/test.json': '{a: 1}',
+            'src/index.js': 'var a = 1;',
+            'package.json': fx.packageJson({servers: {cdn: {port: 3005, dir: 'dist/statics', ssl: true}}})
+          })
+          .spawn('start');
+
+          // This is because we're using self signed certificate - otherwise the request will fail
+          const agent = new https.Agent({
+            rejectUnauthorized: false
+          });
+
+          return cdnIsServing('assets/test.json', 'https', {agent});
         });
       });
     });
@@ -426,9 +446,9 @@ describe('Aggregator: Start', () => {
     return retryPromise({backoff: 100}, () => fetch(`http://localhost:${port}/`));
   }
 
-  function cdnIsServing(name) {
+  function cdnIsServing(name, protocol = 'http', options = {}) {
     return retryPromise({backoff: 100}, () =>
-      fetch(`http://localhost:3005/${name}`)
+      fetch(`${protocol}://localhost:3005/${name}`, options)
         .then(res => {
           expect(res.status).to.equal(200);
           return res.text();
