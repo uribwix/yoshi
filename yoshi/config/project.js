@@ -58,8 +58,7 @@ module.exports = {
     return externalRegexList.some(regex => regex.test(path)) ||
       allSourcesButExternalModules(path);
   },
-  jestConfig: () => _.get(packagejson, 'jest', {}),
-  tslintInstalled: () => !!_.get(packagejson, 'devDependencies.tslint', false),
+  jestConfig: () => _.get(packagejson, 'jest', {})
 };
 
 function getConfig(key, defaultVal = false) {
