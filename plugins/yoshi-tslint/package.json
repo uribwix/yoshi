@@ -12,8 +12,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "glob": "~7.1.2",
-    "tslint": "~5.5.0"
+    "glob": "~7.1.2"
   },
   "devDependencies": {
     "chai": "~3.5.0",
@@ -24,11 +23,9 @@
     "mocha-env-reporter": "~2.0.4",
     "strip-ansi": "~4.0.0",
     "test-phases": "latest",
+    "tslint": "~5.5.0",
     "typescript": "~2.3.0",
     "wnpm-ci": "latest"
-  },
-  "peerDependencies" : {
-    "typescript": "^2.3.0"
   },
   "eslintConfig": {
     "extends": "wix"
