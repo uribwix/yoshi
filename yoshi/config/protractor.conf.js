@@ -26,8 +26,6 @@ const globs = require('../lib/globs');
 const userConfPath = path.resolve('protractor.conf.js');
 const userConf = exists(userConfPath) ? require(userConfPath).config : null;
 
-const shouldUseProtractorBrowserLogs = process.env.PROTRACTOR_BROWSER_LOGS === 'true';
-
 const beforeLaunch = (userConf && userConf.beforeLaunch) || ld.noop;
 const onPrepare = (userConf && userConf.onPrepare) || ld.noop;
 const afterLaunch = (userConf && userConf.afterLaunch) || ld.noop;
@@ -57,9 +55,7 @@ const merged = ld.mergeWith({
     });
   },
   onPrepare: () => {
-    if (shouldUseProtractorBrowserLogs) {
-      setupProtractorLogs();
-    }
+    setupProtractorLogs();
 
     if (merged.framework === 'jasmine' && inTeamCity()) {
       const TeamCityReporter = require('jasmine-reporters').TeamCityReporter;
