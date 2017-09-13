@@ -83,8 +83,6 @@
     "svg-inline-loader": "~0.8.0",
     "ts-loader": "~2.3.0",
     "ts-node": "~3.3.0",
-    "tslint": "~5.5.0",
-    "tslint-config-wix": "~1.0.23",
     "url-loader": "~0.5.9",
     "webpack": "~3.2.0",
     "webpack-bundle-analyzer": "~2.8.3",
@@ -101,8 +99,6 @@
     "yoshi-runtime": "^1.0.7",
     "yoshi-sass": "latest",
     "yoshi-stylelint": "latest",
-    "yoshi-tslint": "latest",
-    "yoshi-typescript": "latest",
     "yoshi-update-node-version": "latest",
     "yoshi-wnpm-release": "latest"
   },
@@ -118,10 +114,9 @@
     "retry-promise": "~1.0.0",
     "shelljs": "~0.7.8",
     "typescript": "~2.3.0",
-    "wnpm-ci": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^2.3.0"
+    "wnpm-ci": "latest",
+    "yoshi-typescript": "latest",
+    "yoshi-tslint": "latest"
   },
   "eslintConfig": {
     "extends": "wix",
