@@ -1,6 +1,5 @@
 'use strict';
 
-const {lint} = require('stylelint');
 const cosmiconfig = require('cosmiconfig');
 
 function hasConfig() {
@@ -11,6 +10,8 @@ function hasConfig() {
 
 module.exports = ({logIfP, base}) => {
   function stylelint() {
+    const {lint} = require('stylelint');
+
     return hasConfig().then(result => {
       if (result) {
         return lint({
