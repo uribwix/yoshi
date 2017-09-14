@@ -61,7 +61,8 @@ module.exports = generators.Base.extend({
           express: '^4.13.4',
           'require-reload': '^0.2.2',
           velocity: '^0.7.2',
-          yoshi: 'latest'
+          yoshi: 'latest',
+          'eslint-config-wix': '^1.1.0'
         }
       };
 

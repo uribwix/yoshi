@@ -75,6 +75,7 @@ module.exports = generators.Base.extend({
           'babel-preset-stage-0': '^6.5.0',
           'react-addons-test-utils': '^15.3.2',
           'react-test-renderer': '^15.5.4',
+          'eslint-config-wix': '^1.1.0',
           chai: '^3.5.0',
           enzyme: '^2.3.0',
           jsdom: '^10.1.0',
