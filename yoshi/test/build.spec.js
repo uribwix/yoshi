@@ -3,13 +3,7 @@ const tp = require('./helpers/test-phases');
 const fx = require('./helpers/fixtures');
 const hooks = require('./helpers/hooks');
 const {getMockedCI} = require('yoshi-utils').utilsTestkit;
-const {
-  outsideTeamCity,
-  insideTeamCity
-} = require('./helpers/env-variables');
-const {
-  readFileSync
-} = require('fs');
+const {outsideTeamCity, insideTeamCity} = require('./helpers/env-variables');
 const retryPromise = require('retry-promise').default;
 const fetch = require('node-fetch');
 
@@ -1235,18 +1229,12 @@ describe('Aggregator: Build', () => {
 
   describe('yoshi-update-node-version', () => {
     it('should use yoshi-update-node-version', () => {
-      const nodeVersion = readFileSync(require.resolve('../templates/.nvmrc'), {
-        encoding: 'utf-8'
-      }).trim();
       const res = test
-        .setup({
-          'package.json': fx.packageJson(),
-          '.nvmrc': '0'
-        })
+        .setup({'package.json': fx.packageJson()})
         .execute('build', [], outsideTeamCity);
 
       expect(res.code).to.be.equal(0);
-      expect(test.content('.nvmrc')).to.equal(nodeVersion);
+      expect(test.contains('.nvmrc')).to.be.true;
     });
   });
 

@@ -8,7 +8,6 @@ const fx = require('./helpers/fixtures');
 const fetch = require('node-fetch');
 const retryPromise = require('retry-promise').default;
 const {outsideTeamCity} = require('./helpers/env-variables');
-const {readFileSync} = require('fs');
 const https = require('https');
 
 describe('Aggregator: Start', () => {
@@ -350,7 +349,6 @@ describe('Aggregator: Start', () => {
     });
 
     it('should use yoshi-update-node-version', () => {
-      const nodeVersion = readFileSync(require.resolve('../templates/.nvmrc'), {encoding: 'utf-8'}).trim();
       child = test
         .setup({
           'src/test.spec.js': '',
@@ -362,7 +360,7 @@ describe('Aggregator: Start', () => {
         .spawn('start', [], outsideTeamCity);
 
       return checkServerLogCreated().then(() =>
-        expect(test.content('.nvmrc')).to.equal(nodeVersion)
+        expect(test.contains('.nvmrc')).to.be.true
       );
     });
 
