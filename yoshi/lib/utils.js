@@ -90,16 +90,7 @@ module.exports.isProduction = () => (process.env.NODE_ENV || '').toLowerCase() =
 
 module.exports.filterNoise = comp => {
   comp.plugin('done', stats => {
-    logIfAny(stats.toString({
-      colors: true,
-      hash: false,
-      chunks: false,
-      assets: false,
-      children: false,
-      version: false,
-      timings: false,
-      modules: false
-    }));
+    logIfAny(stats.toString('minimal'));
     mkdirp.sync(path.resolve('target'));
     fs.writeFileSync('target/webpack-stats.json', JSON.stringify(stats.toJson()));
   });

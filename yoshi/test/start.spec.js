@@ -273,6 +273,24 @@ describe('Aggregator: Start', () => {
             .then(() => test.modify('src/server.js', fx.httpServer('world')))
             .then(() => checkServerIsRespondingWith('world'));
         });
+
+        it(`should log after a file has been changed`, () => {
+          const file = {port: 3200, file: 'app.bundle.js'};
+
+          child = test
+            .setup({
+              'src/client.js': `module.exports = 'hello';\n`,
+              'package.json': fx.packageJson()
+            })
+            .spawn('start');
+
+          return checkServerIsServing(file)
+            .then(() => test.modify('src/client.js', `module.exports = 'bye bye';\n`))
+            .then(() => checkServerReturnsDifferentContent(file))
+            .then(clearStdout)
+            .then(() => test.modify('src/client.js'))
+            .then(() => checkStdout(/\d+\smodule/));
+        });
       });
 
       describe('when using no transpile', () => {
@@ -429,12 +447,17 @@ describe('Aggregator: Start', () => {
     );
   }
 
-  function checkStdout(str) {
+  function checkStdout(filter) {
+    const isRegex = filter instanceof RegExp;
     return retryPromise({backoff: 100}, () =>
-      test.stdout.indexOf(str) > -1 ?
+      (isRegex ? filter.test(test.stdout) : test.stdout.indexOf(filter) > -1) ?
         Promise.resolve() :
         Promise.reject()
     );
+  }
+
+  function clearStdout() {
+    test.stdout = '';
   }
 
   function takePort(port) {
