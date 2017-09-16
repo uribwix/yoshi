@@ -22,7 +22,8 @@ describe('Petri', () => {
             "scope": "infra",
             "owner": "tomasm@wix.com",
             "onlyForLoggedInUsers": true,
-            "testGroups": ["true", "false"]
+            "controlGroup": "false",
+            "variants": ["true"]
           }
         }`
     });
