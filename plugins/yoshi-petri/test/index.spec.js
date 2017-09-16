@@ -19,7 +19,7 @@ describe('Petri', () => {
       'petri-specs/specs.infra.Dummy.json': `
         {
           "specs.infra.Dummy": {
-            "scope": "infra",
+            "scopes": ["infra"],
             "owner": "tomasm@wix.com",
             "onlyForLoggedInUsers": true,
             "controlGroup": "false",

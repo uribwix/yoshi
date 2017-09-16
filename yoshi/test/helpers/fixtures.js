@@ -203,7 +203,7 @@ const fx = {
   petriSpec: () => `
   {
     "specs.infra.Dummy": {
-      "scope": "infra",
+      "scopes": ["infra"],
       "owner": "tomasm@wix.com",
       "onlyForLoggedInUsers": true,
       "controlGroup": "false",
