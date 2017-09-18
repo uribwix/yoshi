@@ -89,7 +89,8 @@
     "webpack-dev-middleware": "~1.11.0",
     "webpack-hot-middleware": "~2.18.2",
     "wix-tpa-style-loader": "~1.0.8",
-    "yoshi-runtime": "^1.0.7"
+    "yoshi-runtime": "^1.0.7",
+    "yoshi-sass": "latest"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
