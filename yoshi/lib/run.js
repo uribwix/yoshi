@@ -11,9 +11,12 @@ const path = require('path');
 const watch = watchMode();
 
 function pluginInstall(modules) {
-  return new Promise(resolve => {
-    spawnSync('npm', ['install', '--silent', '--prefix', 'node_modules/yoshi/plugins'].concat(modules));
-    resolve();
+  return new Promise((resolve, reject) => {
+    const child = spawnSync('npm', ['install', '--prefix', 'node_modules/yoshi/plugins'].concat(modules));
+
+    child.status === 0 ?
+      resolve() :
+      reject(child.stderr.toString());
   });
 }
 
@@ -24,21 +27,24 @@ function pluginRequire(module) {
 
 module.exports = (plugins, options) => {
   const modules = plugins.reduce((all, next) => all.concat(next), []).filter(x => !pluginRequire(x));
-  if (modules.length > 0) {
-    log(pluginInstall)(modules);
-  }
 
-  return plugins.reduce((promise, parallel) => {
+  const install = modules.length > 0 ?
+    log(pluginInstall)(modules) :
+    Promise.resolve();
+
+  const result = plugins.reduce((promise, parallel) => {
     return promise.then(() => {
       return Promise.all(parallel.map(task => {
-        return pluginRequire(task)({log, logIf, logIfP, watch, base, statics, inTeamCity, projectConfig})(options)
-          .catch(error => {
-            logIfAny(error);
-            if (!watch) {
-              process.exit(1);
-            }
-          });
+        return pluginRequire(task)({log, logIf, logIfP, watch, base, statics, inTeamCity, projectConfig})(options);
       }));
     });
-  }, Promise.resolve());
+  }, install);
+
+  return result
+    .catch(error => {
+      logIfAny(error);
+      if (!watch) {
+        process.exit(1);
+      }
+    });
 };
