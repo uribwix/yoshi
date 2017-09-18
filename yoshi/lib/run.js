@@ -12,7 +12,7 @@ const watch = watchMode();
 
 function pluginInstall(modules) {
   return new Promise((resolve, reject) => {
-    const child = spawnSync('npm', ['install', '--prefix', 'node_modules/yoshi/plugins'].concat(modules));
+    const child = spawnSync('npm', ['install', '--prefix', 'node_modules/yoshi/plugins'].concat(modules), {shell: true});
 
     child.status === 0 ?
       resolve() :
