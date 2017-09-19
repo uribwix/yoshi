@@ -195,12 +195,12 @@ describe('Aggregator: Start', () => {
       describe('HTTPS', () => {
         it('should be able to create an https server', () => {
           child = test
-          .setup({
-            'src/assets/test.json': '{a: 1}',
-            'src/index.js': 'var a = 1;',
-            'package.json': fx.packageJson({servers: {cdn: {port: 3005, dir: 'dist/statics', ssl: true}}})
-          })
-          .spawn('start');
+            .setup({
+              'src/assets/test.json': '{a: 1}',
+              'src/index.js': 'var a = 1;',
+              'package.json': fx.packageJson({servers: {cdn: {port: 3005, dir: 'dist/statics', ssl: true}}})
+            })
+            .spawn('start');
 
           // This is because we're using self signed certificate - otherwise the request will fail
           const agent = new https.Agent({
