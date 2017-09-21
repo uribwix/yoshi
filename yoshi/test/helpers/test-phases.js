@@ -15,15 +15,15 @@ class Test {
     this.child = null;
     this.stdout = '';
     this.stderr = '';
+    this.tmp = path.join(sh.tempdir().toString(), new Date().getTime().toString());
   }
 
   setup(tree, hooks = []) {
-    const tmp = this.tmp || (this.tmp = path.join(sh.tempdir().toString(), new Date().getTime().toString()));
     const flat = flattenTree(tree);
-    const files = Object.keys(flat);
-    files.filter(f => !isExternalModule(f)).forEach(file => this.write(file, flat[file]));
-    hooks.forEach(hook => hook(tmp, cwd));
-    files.filter(isExternalModule).forEach(file => this.write(file, flat[file]));
+    Object.keys(flat).forEach(file => {
+      this.write(file, flat[file]);
+    });
+    (hooks || []).forEach(hook => hook(this.tmp));
     return this;
   }
 
@@ -123,10 +123,6 @@ function flattenTree(tree, prefix) {
     }
   });
   return result;
-}
-
-function isExternalModule(module) {
-  return module.startsWith('node_modules/');
 }
 
 module.exports = {

@@ -59,7 +59,6 @@ describe('Aggregator: e2e', () => {
       const res = test
         .setup(multipleModuleWithJasmine(), [hooks.installProtractor])
         .execute('test', ['--protractor'], outsideTeamCity);
-
       expect(res.code).to.equal(0);
       expect(res.stdout).to.contain('protractor');
       expect(res.stdout).to.contain('1 spec, 0 failures');
@@ -220,7 +219,8 @@ describe('Aggregator: e2e', () => {
       'dist/test/some.e2e.js': fx.e2eTestJasmine(),
       'node_modules/client/dist/app.bundle.js': fx.e2eClient(),
       'package.json': fx.packageJson(
-        Object.assign(cdnConfigurations(), {clientProjectName: 'client'})
+        Object.assign(cdnConfigurations(), {clientProjectName: 'client'}),
+        {client: 'file:node_modules/client'}
       )
     };
   }

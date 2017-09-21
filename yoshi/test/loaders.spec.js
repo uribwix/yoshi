@@ -83,7 +83,8 @@ describe('Loaders', () => {
           'package.json': `{\n
             "name": "a",\n
             "dependencies": {\n
-              "babel-plugin-transform-es2015-block-scoping": "latest"\n
+              "babel-plugin-transform-es2015-block-scoping": "latest",\n
+              "wix-style-react": "file:node_modules/wix-style-react"
             }
           }`
         }, [hooks.installDependencies])

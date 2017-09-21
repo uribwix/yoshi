@@ -471,7 +471,8 @@ describe('Aggregator: Test', () => {
             'package.json': `{
               "name": "a",\n
               "dependencies": {\n
-                "babel-plugin-transform-es2015-modules-commonjs": "latest"\n
+                "babel-plugin-transform-es2015-modules-commonjs": "latest",\n
+                "wix-style-react": "file:node_modules/wix-style-react"
               }
             }`
           }, [hooks.installDependencies])
@@ -491,7 +492,8 @@ describe('Aggregator: Test', () => {
             'package.json': `{
               "name": "a",\n
               "dependencies": {\n
-                "babel-plugin-transform-es2015-modules-commonjs": "latest"\n
+                "babel-plugin-transform-es2015-modules-commonjs": "latest",\n
+                "my-unprocessed-module": "file:node_modules/my-unprocessed-module"
               },
               "yoshi": {
                 "externalUnprocessedModules": ["my-unprocessed-module"]

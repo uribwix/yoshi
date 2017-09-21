@@ -4,7 +4,7 @@ const sh = require('shelljs');
 
 module.exports = {
   installProtractor: cwd => {
-    return exec('yarn add protractor@^5.0.0', cwd);
+    return exec('yarn add protractor@^5.0.0 --no-lockfile', cwd);
   },
   installDependencies: cwd => {
     return exec('yarn install --no-lockfile', cwd);
