@@ -1255,6 +1255,29 @@ describe('Aggregator: Build', () => {
     });
   });
 
+
+  describe('symlinks', () => {
+    it('should not resolve symlinks to their symlinked location', () => {
+      const module1 = '.call(exports, "../node_modules/awesome-module1")';
+      const module2 = '.call(exports, "../node_modules/awesome-module2")';
+
+      const res = test
+        .setup({
+          'node_modules/awesome-module1/entry.js': 'module.exports = function() { return __dirname }',
+          'node_modules/awesome-module2/entry.js': 'module.exports = function() { return __dirname }',
+          'src/client.js': `require('awesome-module1/entry.js')`,
+          'package.json': fx.packageJson()
+        }, [
+          hooks.createSymlink('node_modules/awesome-module2/entry.js', 'node_modules/awesome-module1/entry.js')
+        ])
+        .execute('build');
+
+      expect(res.code).to.equal(0);
+      expect(test.content(`dist/${defaultOutput}/app.bundle.js`)).to.contain(module1);
+      expect(test.content(`dist/${defaultOutput}/app.bundle.js`)).to.not.contain(module2);
+    });
+  });
+
   function checkServerIsServing({backoff = 100, max = 100, port = fx.defaultServerPort(), file = ''} = {}) {
     return retryPromise({backoff, max}, () => fetch(`http://localhost:${port}/${file}`)
       .then(res => res.text()));
