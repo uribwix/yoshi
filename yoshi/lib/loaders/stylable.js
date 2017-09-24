@@ -1,24 +1,21 @@
 'use strict';
+const StylablePlugin = require('stylable-integration/webpack-plugin');
 
-const stylableLoaderOptions = {injectFileCss: true};
+const stylableOptions = {
+  injectBundleCss: true,
+  filename: '[name].stylable.bundle.css',
+  nsDelimiter: '--'
+};
 
-module.exports = () => {
-  return {
-    client: [
-      {
-        test: /\.st\.css$/,
-        loader: 'stylable-integration/webpack-loader',
-        options: stylableLoaderOptions
-      }
-    ],
-    specs: {
-      test: /\.st\.css$/,
-      use: [
-        {
-          loader: 'stylable-integration/webpack-loader',
-          options: stylableLoaderOptions
-        }
-      ]
-    }
-  };
+const stylableRegExp = /\.st\.css$/;
+
+module.exports.stylableOptions = stylableOptions;
+module.exports.stylableRegExp = stylableRegExp;
+
+module.exports.plugin = function (options = stylableOptions) {
+  return new StylablePlugin(options);
+};
+
+module.exports.rule = function (match = stylableRegExp) {
+  return StylablePlugin.rule(match);
 };

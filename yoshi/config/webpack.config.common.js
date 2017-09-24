@@ -5,8 +5,7 @@ const context = path.resolve('./src');
 const projectConfig = require('./project');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
-const StylablePlugin = require('stylable-integration/webpack-plugin');
-const stylableOptions = {injectFileCss: true};
+const stylable = require('../lib/loaders/stylable');
 
 const config = {
   context,
@@ -30,7 +29,7 @@ const config = {
   plugins: [
     new CaseSensitivePathsPlugin(),
     require('../lib/plugins/babelHappyPack')(projectConfig.isAngularProject()),
-    new StylablePlugin(stylableOptions)
+    stylable.plugin()
   ],
 
   module: {
@@ -41,7 +40,8 @@ const config = {
       require('../lib/loaders/assets')(),
       require('../lib/loaders/svg')(),
       require('../lib/loaders/html')(),
-      require('../lib/loaders/raw')()
+      require('../lib/loaders/raw')(),
+      stylable.rule()
     ]
   },
 

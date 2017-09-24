@@ -4,6 +4,8 @@ const path = require('path');
 const {merge} = require('lodash/fp');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const {cssModulesPattren} = require('yoshi-runtime');
+const stylable = require('./stylable');
+
 const useResolveUrlLoader = process.env.RESOLVE_URL_LOADER === 'true';
 
 module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
@@ -23,8 +25,8 @@ module.exports = (separateCss, cssModules, tpaStyle, projectName) => {
     includePaths: ['node_modules', 'node_modules/compass-mixins/lib']
   };
 
-  const globalRegex = /\.global.s?css$/;
-  const stylableRegex = /\.st\.css$/;
+  const globalRegex = /\.global\.s?css$/;
+  const stylableRegex = stylable.stylableRegExp;
 
   const getScssRule = (ruleConfig, loaderConfig) => merge(ruleConfig, {
     test: /\.s?css$/,
