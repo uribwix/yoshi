@@ -2,6 +2,7 @@
 
 const express = require('express');
 const projectConfig = require('../config/project');
+const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
@@ -33,6 +34,25 @@ function start({middlewares = [], host}) {
 
   [corsMiddleware(), express.static(files), ...middlewares]
     .forEach(mw => app.use(mw));
+
+  app.use((req, res, next) => {
+    if (!/\.min\.(js|css)/.test(req.originalUrl)) {
+      return next();
+    }
+
+    const httpModule = req.protocol === 'http' ? http : https;
+
+    const options = {
+      port,
+      hostname: host,
+      path: req.originalUrl.replace('.min', ''),
+      rejectUnauthorized: false,
+    };
+
+    const request = httpModule.request(options, proxy => proxy.pipe(res));
+
+    request.on('error', () => next()).end();
+  });
 
   return new Promise((resolve, reject) => {
     const serverFactory = ssl ? httpsServer(app) : app;

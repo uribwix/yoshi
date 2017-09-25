@@ -129,6 +129,36 @@ describe('Aggregator: Start', () => {
     });
 
     describe('CDN server', () => {
+      it('should serve files without "min" suffix when requested with a "min" suffix', () => {
+        child = test
+          .setup({
+            'src/client.js': `module.exports = {};`,
+            'package.json': fx.packageJson()
+          })
+          .spawn('start');
+
+        return checkServerIsServing({port: 3200, file: 'app.bundle.min.js'})
+          .then(content =>
+            expect(content).to.contain(`__webpack_require__.p = "//localhost:3200/";`));
+      });
+
+      it('should serve files without "min" suffix when requested with a "min" suffix in ssl', () => {
+        child = test
+          .setup({
+            'src/client.js': `module.exports = {};`,
+            'package.json': fx.packageJson({servers: {cdn: {ssl: true}}})
+          })
+          .spawn('start');
+
+        const agent = new https.Agent({
+          rejectUnauthorized: false
+        });
+
+        return checkServerIsServing({port: 3200, file: 'app.bundle.min.js', protocol: 'https', options: {agent}})
+          .then(content =>
+            expect(content).to.contain(`__webpack_require__.p = "//localhost:3200/";`));
+      });
+
       it('should run cdn server with default dir', () => {
         child = test
           .setup({
@@ -183,7 +213,6 @@ describe('Aggregator: Start', () => {
             'package.json': fx.packageJson()
           })
           .spawn('start');
-
 
         return fetchCDN().then(res => {
           expect(res.headers.get('Access-Control-Allow-Methods')).to.equal('GET, OPTIONS');
@@ -466,8 +495,11 @@ describe('Aggregator: Start', () => {
     return () => new Promise(resolve => setTimeout(resolve, time));
   }
 
-  function checkServerIsServing({backoff = 100, max = 10, port = fx.defaultServerPort(), file = ''} = {}) {
-    return retryPromise({backoff, max}, () => fetch(`http://localhost:${port}/${file}`).then(res => res.text()));
+  function checkServerIsServing({backoff = 100, max = 10, port = fx.defaultServerPort(), file = '', protocol = 'http', options = {}} = {}) {
+    return retryPromise({backoff, max}, () =>
+      fetch(`${protocol}://localhost:${port}/${file}`, options)
+        .then(res => res.text())
+    );
   }
 
   function checkServerReturnsDifferentContent({backoff = 100, max = 10, port = fx.defaultServerPort(), file = ''} = {}) {
