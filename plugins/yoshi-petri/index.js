@@ -5,6 +5,7 @@
 
 const path = require('path');
 const petriSpecs = require('petri-specs/lib/petri-specs');
+const chalk = require('chalk');
 
 function runWatch() {
   // TODO: implement watch mode using chokidar
@@ -17,7 +18,12 @@ module.exports = ({watch, statics}) => {
 
   function runBuild() {
     const options = {directory, json};
+    const {convertedFilesCount} = petriSpecs.convert(options);
     petriSpecs.build(options);
+
+    if (convertedFilesCount > 0) {
+      console.warn(chalk.yellow(`Warning: yoshi-petri converted ${convertedFilesCount} deprecated specs to the new format. Please verify, commit and push those files before 01/11/2017. More info: https://github.com/wix-private/petri-specs/docs/CONVERT_SPECS.md`));
+    }
 
     return Promise.resolve();
   }
