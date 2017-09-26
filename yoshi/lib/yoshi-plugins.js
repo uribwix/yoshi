@@ -25,7 +25,7 @@ module.exports = options => ({
   build: [
     ['yoshi-clean', 'yoshi-update-node-version', './tasks/warn-add-stories-to-base-glob'],
     ['yoshi-sass', './tasks/less', 'yoshi-petri', 'yoshi-maven-statics', 'yoshi-copy', transpiler(), './tasks/bundle'],
-    ['yoshi-fedops-build-report', './tasks/warn-moment-optimize']
+    ['yoshi-fedops-build-report']
   ],
   lint: [[linter, 'yoshi-stylelint', './tasks/warn-add-stories-to-base-glob']],
   release: [['yoshi-wnpm-release']],

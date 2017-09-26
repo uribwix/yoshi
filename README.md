@@ -318,3 +318,4 @@ Use this if you are writing a library and want to publish it as single file. Lib
 - [How to I analyze my webpack bundle contents](docs/faq/WEBPACK-ANALYZE.md)
 - [How do I separately bundle common logic for multiple entries?](docs/faq/COMMONS-CHUNK.md)
 - [How to use SVG](docs/faq/SVG.md)
+- [Moment.js locales are missing](docs/faq/MOMENT_OPTIMIZATION.md)
