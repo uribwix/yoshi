@@ -220,6 +220,18 @@ describe('Aggregator: Start', () => {
         });
       });
 
+      it('should support resource timing headers', () => {
+        child = test
+          .setup({
+            'package.json': fx.packageJson()
+          })
+          .spawn('start');
+
+        return fetchCDN().then(res => {
+          expect(res.headers.get('Timing-Allow-Origin')).to.equal('*');
+        });
+      });
+
       describe('HTTPS', () => {
         it('should be able to create an https server', () => {
           child = test

@@ -26,13 +26,20 @@ function corsMiddleware() {
   };
 }
 
+function resourceTimingMiddleware() {
+  return (req, res, next) => {
+    res.setHeader('Timing-Allow-Origin', '*');
+    next();
+  };
+}
+
 function start({middlewares = [], host}) {
   const port = projectConfig.servers.cdn.port();
   const ssl = projectConfig.servers.cdn.ssl();
   const files = projectConfig.clientFilesPath();
   const app = express();
 
-  [corsMiddleware(), express.static(files), ...middlewares]
+  [corsMiddleware(), resourceTimingMiddleware(), express.static(files), ...middlewares]
     .forEach(mw => app.use(mw));
 
   app.use((req, res, next) => {
