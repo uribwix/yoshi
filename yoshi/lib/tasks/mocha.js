@@ -1,57 +1,75 @@
 'use strict';
 
-const path = require('path');
-const gulp = require('gulp');
 const spawn = require('cross-spawn');
 const projectConfig = require('../../config/project');
 const globs = require('../globs');
 const {inTeamCity} = require('../utils');
 
-const files = projectConfig.specs.node() || globs.specs();
+const pattern = projectConfig.specs.node() || globs.specs();
 
-const mochaBin = path.join('mocha', 'bin', 'mocha');
-const baseEnv = {mocha_reporter: inTeamCity() ? '' : 'progress'}; //eslint-disable-line camelcase
-const env = Object.assign(baseEnv, process.env, {NODE_ENV: 'test', SRC_PATH: './src'});
-const options = {cwd: process.cwd(), env, stdio: 'inherit'};
-const args = {
-  reporter: 'mocha-env-reporter',
-  timeout: 30000,
-  recursive: true,
-  require: [absolute('..', '..', 'config', 'test-setup')]
+let proc;
+
+const toCliArgs = options => {
+  return Object
+    .keys(options)
+    .reduce((args, key) => {
+      const value = options[key];
+
+      if (value === true) {
+        return [...args, `--${key}`];
+      }
+
+      if (value === false) {
+        return args;
+      }
+
+      if (Array.isArray(value)) {
+        return [...args, ...value.reduce((a, v) => [...a, `--${key}`, v], [])];
+      }
+
+      return [...args, `--${key}`, value];
+    }, []);
 };
+
+const runMocha = options => new Promise((resolve, reject) => {
+  if (proc) {
+    proc.kill();
+  }
+
+  const args = toCliArgs(options);
+
+  const baseEnv = {
+    mocha_reporter: inTeamCity() ? '' : 'progress', // eslint-disable-line camelcase
+    NODE_ENV: 'test', SRC_PATH: './src'
+  };
+
+  proc = spawn(process.execPath, [require.resolve('mocha/bin/mocha'), ...args, pattern], {
+    cwd: process.cwd(),
+    env: Object.assign(baseEnv, process.env),
+    stdio: 'inherit'
+  });
+
+  proc.on('close', code => (code !== 0 ? reject() : resolve()));
+});
+
+process.on('exit', () => {
+  if (proc) {
+    proc.kill('SIGTERM');
+  }
+});
 
 module.exports = ({log, watch}) => {
   function mocha() {
-    if (watch) {
-      gulp.watch(`${globs.base()}/**/*`, runMocha);
-    }
+    const options = {
+      reporter: 'mocha-env-reporter',
+      timeout: 30000,
+      recursive: true,
+      require: [require.resolve('../../config/test-setup')],
+      watch,
+    };
 
-    return runMocha();
+    return runMocha(options);
   }
 
   return log(mocha);
 };
-
-function runMocha() {
-  return new Promise((resolve, reject) => {
-    const proc = spawn('node', [require.resolve(mochaBin), ...toCliArgs(args), files], options);
-    proc.on('close', code => code ? reject() : resolve());
-  });
-}
-
-function absolute(...a) {
-  return path.join(__dirname, ...a);
-}
-
-function toCliArgs(args) {
-  return Object.keys(args).reduce((result, name) => {
-    return [...result, ...decorate(args[name], name)];
-  }, []);
-}
-
-function decorate(value, name) {
-  return []
-    .concat(value)
-    .map(val => [`--${name}`].concat(val === true ? [] : String(val)))
-    .reduce((acc, val) => [...acc, ...val], []);
-}
