@@ -66,6 +66,7 @@ module.exports = ({log, watch}) => {
       recursive: true,
       require: [require.resolve('../../config/test-setup')],
       watch,
+      'watch-extensions': 'js,tsx,ts'
     };
 
     return runMocha(options);
