@@ -3,7 +3,6 @@
 const tp = require('./helpers/test-phases');
 const fx = require('./helpers/fixtures');
 const expect = require('chai').expect;
-const hooks = require('./helpers/hooks');
 const _ = require('lodash');
 const {getMockedCI} = require('yoshi-utils').utilsTestkit;
 
@@ -27,14 +26,11 @@ describe('Loaders', () => {
       test
         .setup({
           'src/client.js': `let aServerFunction = 1;`,
-          '.babelrc': `{"plugins": ["transform-es2015-block-scoping"]}`,
+          '.babelrc': `{"plugins": ["${require.resolve('babel-plugin-transform-es2015-block-scoping')}"]}`,
           'package.json': `{\n
-            "name": "a",\n
-            "dependencies": {\n
-              "babel-plugin-transform-es2015-block-scoping": "latest"\n
-            }
+            "name": "a"
           }`
-        }, [hooks.installDependencies])
+        })
         .execute('build');
 
       expect(test.content('dist/statics/app.bundle.js')).to.contain('var aServerFunction = 1;');
@@ -79,15 +75,14 @@ describe('Loaders', () => {
         .setup({
           'src/client.js': `require('wix-style-react/src')`,
           'node_modules/wix-style-react/src/index.js': 'let a = 1',
-          '.babelrc': `{"plugins": ["transform-es2015-block-scoping"]}`,
+          '.babelrc': `{"plugins": ["${require.resolve('babel-plugin-transform-es2015-block-scoping')}"]}`,
           'package.json': `{\n
             "name": "a",\n
             "dependencies": {\n
-              "babel-plugin-transform-es2015-block-scoping": "latest",\n
               "wix-style-react": "file:node_modules/wix-style-react"
             }
           }`
-        }, [hooks.installDependencies])
+        })
         .execute('build');
 
       expect(res.code).to.equal(0);

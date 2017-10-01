@@ -8,7 +8,7 @@ const {inTeamCity} = require('../utils');
 module.exports = ({log, watch}) => {
   function jest() {
     if (inTeamCity()) {
-      jestProjectConfig.testResultsProcessor = 'jest-teamcity-reporter';
+      jestProjectConfig.testResultsProcessor = require.resolve('jest-teamcity-reporter');
       process.argv.push('--teamcity');
     }
 

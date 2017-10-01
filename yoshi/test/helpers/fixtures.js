@@ -50,7 +50,7 @@ const fx = {
   protractorConfWithStatics: ({framework, cdnPort} = {}) => `
     const path = require('path');
     const http = require("http");
-    const express = require('express');
+    const express = require('${require.resolve('express')}');
     const app = express();
 
     exports.config = {

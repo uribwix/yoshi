@@ -4,7 +4,6 @@ const expect = require('chai').expect;
 const tp = require('./helpers/test-phases');
 const fx = require('./helpers/fixtures');
 const {outsideTeamCity, insideTeamCity} = require('./helpers/env-variables');
-const hooks = require('./helpers/hooks');
 const {getMockedCI} = require('yoshi-utils').utilsTestkit;
 
 describe('Aggregator: Test', () => {
@@ -202,12 +201,9 @@ describe('Aggregator: Test', () => {
               // some implementation;
             };`,
           'package.json': `{
-            "name": "a",\n
-            "dependencies": {\n
-              "jest-teamcity-reporter": "latest"\n
-            }
+            "name": "a"
           }`
-        }, [hooks.installDependencies])
+        })
         .execute('test', ['--jest'], insideTeamCity);
 
       expect(res.code).to.equal(0);
@@ -238,14 +234,11 @@ describe('Aggregator: Test', () => {
             "name": "a",\n
             "jest": {
               "moduleNameMapper": {
-                ".scss$": "identity-obj-proxy"
+                ".scss$": "${require.resolve('identity-obj-proxy')}"
               }
-            },
-            "devDependencies": {
-              "identity-obj-proxy": "^3.0.0"
             }
           }`
-        }, [hooks.installDependencies])
+        })
         .execute('test', ['--jest']);
 
       expect(res.code).to.equal(0);
@@ -464,18 +457,14 @@ describe('Aggregator: Test', () => {
       it('should transpile both sources and specified 3rd party modules in runtime', function () {
         const res = test
           .setup({
-            '.babelrc': `{"plugins": ["babel-plugin-transform-es2015-modules-commonjs"]}`,
+            '.babelrc': `{"plugins": ["${require.resolve('babel-plugin-transform-es2015-modules-commonjs')}"]}`,
             'node_modules/wix-style-react/src/index.js': 'export default 1',
             'test/some.js': `import x from 'wix-style-react/src'; export default x => x`,
             'test/some.spec.js': `import identity from './some'; it.only("pass", () => 1);`,
             'package.json': `{
-              "name": "a",\n
-              "dependencies": {\n
-                "babel-plugin-transform-es2015-modules-commonjs": "latest",\n
-                "wix-style-react": "file:node_modules/wix-style-react"
-              }
+              "name": "a"
             }`
-          }, [hooks.installDependencies])
+          })
           .execute('test', ['--mocha']);
 
         expect(res.code).to.equal(0);
@@ -485,21 +474,17 @@ describe('Aggregator: Test', () => {
       it('should transpile explicitly configured externalUnprocessedModules', function () {
         const res = test
           .setup({
-            '.babelrc': `{"plugins": ["babel-plugin-transform-es2015-modules-commonjs"]}`,
+            '.babelrc': `{"plugins": ["${require.resolve('babel-plugin-transform-es2015-modules-commonjs')}"]}`,
             'node_modules/my-unprocessed-module/index.js': 'export default 1',
             'test/some.js': `import x from 'my-unprocessed-module'; export default x => x`,
             'test/some.spec.js': `import identity from './some'; it.only("pass", () => 1);`,
             'package.json': `{
-              "name": "a",\n
-              "dependencies": {\n
-                "babel-plugin-transform-es2015-modules-commonjs": "latest",\n
-                "my-unprocessed-module": "file:node_modules/my-unprocessed-module"
-              },
+              "name": "a",
               "yoshi": {
                 "externalUnprocessedModules": ["my-unprocessed-module"]
               }
             }`
-          }, [hooks.installDependencies])
+          })
           .execute('test', ['--mocha']);
 
         expect(res.code).to.equal(0);
@@ -517,7 +502,7 @@ describe('Aggregator: Test', () => {
             });
           `,
             'package.json': fx.packageJson()
-          }, [hooks.installDependencies])
+          })
           .execute('test', ['--mocha']);
 
         expect(res.code).to.equal(0);
@@ -531,7 +516,7 @@ describe('Aggregator: Test', () => {
           'tsconfig.json': fx.tsconfig(),
           'test/some.spec.ts': `declare var it: any; it.only("pass", () => 1);`,
           'package.json': fx.packageJson()
-        }, [tmp => hooks.installDependency(tmp)('ts-node')])
+        })
         .execute('test', ['--mocha']);
 
       expect(res.code).to.equal(0);
@@ -579,7 +564,7 @@ describe('Aggregator: Test', () => {
             const assert = require('assert');
             it("pass", () => assert.equal(global["foo"], 123));`,
           'package.json': fx.packageJson()
-        }, [tmp => hooks.installDependency(tmp)('ts-node'), tmp => hooks.installDependency(tmp)('@types/node'), tmp => hooks.installDependency(tmp)('@types/mocha')])
+        })
         .execute('test', ['--mocha']);
 
       expect(res.code).to.equal(0);

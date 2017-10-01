@@ -220,19 +220,16 @@ describe('Aggregator: Build', () => {
           'src/a.js': 'const a = 1;',
           'src/b.ts': 'const b = 2;',
           'tsconfig.json': fx.tsconfig(),
-          '.babelrc': `{"plugins": ["transform-es2015-block-scoping"]}`,
+          '.babelrc': `{"plugins": ["${require.resolve('babel-plugin-transform-es2015-block-scoping')}"]}`,
           'pom.xml': fx.pom(),
           'package.json': `{
               "name": "a",\n
               "version": "1.0.4",\n
-              "dependencies": {\n
-                "babel-plugin-transform-es2015-block-scoping": "latest"\n
-              },
               "yoshi": {
                 "entry": "./a.js"
               }}`
 
-        }, [hooks.installDependencies])
+        })
         .execute('build');
 
       expect(resp.code).to.equal(0);
@@ -509,19 +506,16 @@ describe('Aggregator: Build', () => {
         .setup({
           'src/app.js': `const thisIsWorks = true;`,
           'src/app.spec.js': `const thisIsWorksAgain = true;`,
-          '.babelrc': `{"plugins": ["transform-es2015-block-scoping"]}`,
+          '.babelrc': `{"plugins": ["${require.resolve('babel-plugin-transform-es2015-block-scoping')}"]}`,
           'pom.xml': fx.pom(),
           'package.json': `{\n
               "name": "a",\n
               "version": "1.0.4",\n
-              "dependencies": {\n
-                "babel-plugin-transform-es2015-block-scoping": "latest"\n
-              },
               "yoshi": {
                 "entry": "./app.js"
               }
             }`
-        }, [hooks.installDependencies])
+        })
         .execute('build');
 
       expect(res.code).to.equal(0);
@@ -797,7 +791,7 @@ describe('Aggregator: Build', () => {
       const res = myTest
         .setup({
           'src/index.js': `
-            const {wixCssModulesRequireHook} = require('yoshi-runtime');
+            const {wixCssModulesRequireHook} = require('${require.resolve('yoshi-runtime')}');
             wixCssModulesRequireHook('./src');
             const s = require('./styles/my-file.css')
             console.log(s);
@@ -806,16 +800,13 @@ describe('Aggregator: Build', () => {
           'package.json': `{
             "name": "a",\n
             "version": "1.0.4",\n
-            "dependencies": {\n
-              "yoshi-runtime": "latest"\n
-            },
             "yoshi": {
               "cssModules": true,
               "separateCss": true
             }
           }`,
           'pom.xml': fx.pom()
-        }, [hooks.installDependencies])
+        })
         .execute('', [], {NODE_ENV: 'production'});
 
       expect(res.code).to.equal(0);

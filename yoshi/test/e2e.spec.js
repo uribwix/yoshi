@@ -4,7 +4,6 @@ const path = require('path');
 const expect = require('chai').expect;
 const tp = require('./helpers/test-phases');
 const fx = require('./helpers/fixtures');
-const hooks = require('./helpers/hooks');
 const {exists} = require('../lib/utils');
 const {outsideTeamCity, insideTeamCity} = require('./helpers/env-variables');
 const {getMockedCI} = require('yoshi-utils').utilsTestkit;
@@ -24,7 +23,7 @@ describe('Aggregator: e2e', () => {
         .setup({
           'protractor.conf.js': '',
           'package.json': fx.packageJson()
-        }, [hooks.installProtractor])
+        })
         .execute('test', ['--protractor'], outsideTeamCity);
       const chromedriver = path.resolve('node_modules', 'webdriver-manager', 'selenium', 'chromedriver_2.28.zip');
 
@@ -34,7 +33,7 @@ describe('Aggregator: e2e', () => {
 
     it('should support single module structure by default', () => {
       const res = test
-        .setup(singleModuleWithJasmine(), [hooks.installProtractor])
+        .setup(singleModuleWithJasmine())
         .execute('test', ['--protractor'], outsideTeamCity);
 
       expect(res.code).to.equal(0);
@@ -46,7 +45,7 @@ describe('Aggregator: e2e', () => {
 
     it('should take a screenshot at the end of a failing test', () => {
       const res = test
-        .setup(singleModuleWithFailingJasmine(), [hooks.installProtractor])
+        .setup(singleModuleWithFailingJasmine())
         .execute('test', ['--protractor'], outsideTeamCity, {silent: true}); // run in silent so that TC won't fail with the screenshot log
 
       expect(res.code).to.equal(1);
@@ -57,7 +56,7 @@ describe('Aggregator: e2e', () => {
 
     it(`should support multiple modules structure and consider clientProjectName configuration`, () => {
       const res = test
-        .setup(multipleModuleWithJasmine(), [hooks.installProtractor])
+        .setup(multipleModuleWithJasmine())
         .execute('test', ['--protractor'], outsideTeamCity);
       expect(res.code).to.equal(0);
       expect(res.stdout).to.contain('protractor');
@@ -66,7 +65,7 @@ describe('Aggregator: e2e', () => {
 
     it('should run protractor with mocha', () => {
       const res = test
-        .setup(singleModuleWithMocha(), [hooks.installProtractor])
+        .setup(singleModuleWithMocha())
         .execute('test', ['--protractor'], outsideTeamCity);
 
       expect(res.code).to.equal(0);
@@ -76,7 +75,7 @@ describe('Aggregator: e2e', () => {
 
     it('should run protractor with mocha and use TeamCity reporter', () => {
       const res = test
-        .setup(singleModuleWithMocha(), [hooks.installProtractor])
+        .setup(singleModuleWithMocha())
         .execute('test', ['--protractor'], insideTeamCity);
 
       expect(res.code).to.equal(0);
@@ -88,7 +87,7 @@ describe('Aggregator: e2e', () => {
       this.timeout(60000);
 
       const res = test
-        .setup(singleModuleWithJasmineAndES6Imports(true), [hooks.installDependencies, hooks.installProtractor])
+        .setup(singleModuleWithJasmineAndES6Imports(true))
         .execute('test', ['--protractor'], outsideTeamCity);
 
       expect(res.code).to.equal(0);
@@ -102,7 +101,7 @@ describe('Aggregator: e2e', () => {
       this.timeout(60000);
 
       const res = test
-        .setup(singleModuleWithJasmineAndES6Imports(false), [hooks.installProtractor])
+        .setup(singleModuleWithJasmineAndES6Imports(false))
         .execute('test', ['--protractor'], outsideTeamCity);
 
       expect(res.code).to.equal(1);
@@ -125,7 +124,7 @@ describe('Aggregator: e2e', () => {
     this.timeout(60000);
 
     test
-      .setup(singleModuleWithCssModules(), [hooks.installDependencies, hooks.installProtractor])
+      .setup(singleModuleWithCssModules())
       .execute('build', [], getMockedCI({ci: false}));
 
     const res = test.execute('test', ['--protractor'], getMockedCI({ci: false}));
@@ -137,7 +136,7 @@ describe('Aggregator: e2e', () => {
     this.timeout(60000);
 
     test
-      .setup(singleModuleWithCssModulesAndSass(), [hooks.installDependencies, hooks.installProtractor])
+      .setup(singleModuleWithCssModulesAndSass())
       .execute('build', [], getMockedCI({ci: false}));
 
     const res = test.execute('test', ['--protractor'], getMockedCI({ci: false}));
@@ -148,7 +147,7 @@ describe('Aggregator: e2e', () => {
   it('should extend project\'s beforeLaunch', function () {
     this.timeout(60000);
     const res = test
-    .setup(singleModuleWithBeforeLaunch(), [hooks.installProtractor])
+    .setup(singleModuleWithBeforeLaunch())
     .execute('test', ['--protractor'], outsideTeamCity);
 
     expect(res.code).to.equal(0);
@@ -163,7 +162,7 @@ describe('Aggregator: e2e', () => {
         'dist/test/some.e2e.js': `it('some test', () => {})`,
         'package.json': fx.packageJson(),
         'protractor.conf.js': fx.protractorConfWithAfterLaunch()
-      }, [hooks.installProtractor])
+      })
       .execute('test', ['--protractor'], outsideTeamCity);
 
     expect(res.code).to.equal(0);
@@ -187,10 +186,7 @@ describe('Aggregator: e2e', () => {
           "name": "a",\n
           "version": "1.0.4",\n
           "yoshi": ${JSON.stringify(Object.assign(cdnConfigurations(), {runIndividualTranspiler}))},
-          "dependencies": {
-            "babel-plugin-transform-es2015-modules-commonjs": "latest"
-          },
-          "babel": { "plugins": ["transform-es2015-modules-commonjs"] }
+          "babel": { "plugins": ["${require.resolve('babel-plugin-transform-es2015-modules-commonjs')}"] }
         }`
     });
   }
@@ -244,7 +240,7 @@ describe('Aggregator: e2e', () => {
         document.body.innerHTML = style.className;
       `,
       'src/some.css': `.class-name {color: green;}`,
-      'package.json': fx.packageJson(cdnConfigurations(), {express: 'latest'})
+      'package.json': fx.packageJson(cdnConfigurations())
     };
   }
 
@@ -257,7 +253,7 @@ describe('Aggregator: e2e', () => {
       `,
       'src/some-2.scss': `$txt-color:green; .class-name { color: $txt-color }`,
       'src/some.scss': `@import "./some-2.scss"`,
-      'package.json': fx.packageJson(cdnConfigurations(), {express: 'latest'})
+      'package.json': fx.packageJson(cdnConfigurations())
     };
   }
 
