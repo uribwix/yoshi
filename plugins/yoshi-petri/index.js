@@ -12,12 +12,13 @@ function runWatch() {
   return Promise.resolve();
 }
 
-module.exports = ({watch, statics}) => {
+module.exports = ({watch, statics, projectConfig}) => {
   const directory = 'petri-specs';
   const json = path.join(statics(), 'petri-experiments.json');
+  const petriSpecsConfig = projectConfig.petriSpecsConfig();
 
   function runBuild() {
-    const options = {directory, json};
+    const options = Object.assign({directory, json}, petriSpecsConfig);
     const {convertedFilesCount} = petriSpecs.convert(options);
     petriSpecs.build(options);
 

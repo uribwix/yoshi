@@ -5,43 +5,8 @@ const tp = require('test-phases');
 const petri = require('../index');
 const intercept = require('intercept-stdout');
 const stripAnsi = require('strip-ansi');
-
-function pom() {
-  return `<?xml version="1.0" encoding="UTF-8"?>
-  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-      <modelVersion>4.0.0</modelVersion>
-      <groupId>com.wixpress</groupId>
-      <artifactId>yoshi</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-      <name>yoshi</name>
-      <description>yoshi</description>
-      <packaging>pom</packaging>
-
-      <parent>
-          <groupId>com.wixpress.common</groupId>
-          <artifactId>wix-master-parent</artifactId>
-          <version>100.0.0-SNAPSHOT</version>
-      </parent>
-
-      <developers>
-          <developer>
-              <name>Lior Belinksy</name>
-              <email>liorbe@wix.com</email>
-              <roles>
-                  <role>owner</role>
-              </roles>
-          </developer>
-      </developers>
-  </project>
-  `;
-}
-
-function baseFsWith(files = {}) {
-  return Object.assign({
-    'package.json': '',
-    'pom.xml': pom()
-  }, files);
-}
+const petriSpecsTestkit = require('petri-specs/test/testkit');
+const petriTestUtils = require('petri-specs/test/test-utils');
 
 describe('Petri', () => {
   let test;
@@ -54,24 +19,20 @@ describe('Petri', () => {
   }));
   beforeEach(() => test = tp.create());
   beforeEach(() => process.chdir(test.tmp));
-  beforeEach(() => task = petri({watch: false, statics: () => 'statics'}));
+  beforeEach(() => task = ({petriSpecsConfig = {}} = {}) =>
+    petri({
+      watch: false,
+      statics: () => 'statics',
+      projectConfig: {petriSpecsConfig: () => petriSpecsConfig},
+    })());
 
   afterEach(() => test.teardown());
   afterEach(() => stdout = '');
   after(() => cleanup());
 
   it('should create petri-experiments.json file inside dist/statics folder', () => {
-    test.setup(baseFsWith({
-      'petri-specs/specs.infra.Dummy.json': `
-        {
-          "specs.infra.Dummy": {
-            "scopes": ["infra"],
-            "owner": "tomasm@wix.com",
-            "onlyForLoggedInUsers": true,
-            "controlGroup": "false",
-            "variants": ["true"]
-          }
-        }`
+    test.setup(petriSpecsTestkit.baseFsWith({
+      'petri-specs/specs.infra.Dummy.json': JSON.stringify(petriSpecsTestkit.spec('specs.infra.Dummy'))
     }));
 
     return task()
@@ -81,17 +42,28 @@ describe('Petri', () => {
       });
   });
 
+  it('should create petri-experiments.json from translation keys with config', () => {
+    test.setup(petriSpecsTestkit.baseFsWith({
+      'src/assets/messages_en.json': JSON.stringify(petriSpecsTestkit.translationWithSpecs('translation1'))
+    }));
+
+    return task({
+      petriSpecsConfig: {
+        scopes: ['alt-scope', 'alt-scope2'],
+        onlyForLoggedInUsers: false
+      }})
+      .then(() => {
+        expect(stdout).not.to.contain('Warning: yoshi-petri converted');
+        expect(test.list('statics', '-R')).to.contain('petri-experiments.json');
+        expect(JSON.parse(test.content('statics/petri-experiments.json'))).to.eql(Object.assign({},
+          petriSpecsTestkit.translationSpec('specs.abTranslate.alt-scope.translation1', petriTestUtils.and({scopes: ['alt-scope', 'alt-scope2'], onlyForLoggedInUsers: false}))
+        ));
+      });
+  });
+
   it('should warn when converting deprecated json files', () => {
-    test.setup(baseFsWith({
-      'petri-specs/specs.infra.Dummy.json': `
-          {
-            "specs.infra.Dummy": {
-              "scope": "infra",
-              "owner": "tomasm@wix.com",
-              "onlyForLoggedInUsers": true,
-              "testGroups": ["false", "true"]
-            }
-          }`
+    test.setup(petriSpecsTestkit.baseFsWith({
+      'petri-specs/specs.infra.Dummy.json': JSON.stringify(petriSpecsTestkit.singleScopeSpec('specs.infra.Dummy'))
     }));
 
     return task()
