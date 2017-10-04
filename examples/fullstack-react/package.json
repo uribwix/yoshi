@@ -1,7 +1,7 @@
 {
   "name": "fullstack-react-example",
   "version": "1.0.0",
-  "homepage": "",
+  "homepage": "https://github.com/wix/yoshi/tree/master/examples/fullstack-react",
   "private": true,
   "author": {
     "name": "master-author-name",
@@ -44,5 +44,9 @@
   },
   "eslintConfig": {
     "extends": "wix/react"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/examples/fullstack-react"
   }
 }

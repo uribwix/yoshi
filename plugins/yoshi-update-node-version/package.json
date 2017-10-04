@@ -23,5 +23,10 @@
   },
   "eslintConfig": {
     "extends": "wix"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/plugins/yoshi-update-node-version",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/plugins/yoshi-update-node-version"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "react-fullstack-react-puppeteer",
   "version": "1.0.0",
-  "homepage": "",
+  "homepage": "https://github.com/wix/yoshi/tree/master/examples/fullstack-react-puppeteer",
   "private": true,
   "author": {
     "name": "Yaniv Efraim",
@@ -50,5 +50,9 @@
   },
   "eslintConfig": {
     "extends": "wix/react"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/examples/fullstack-react-puppeteer"
   }
 }

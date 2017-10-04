@@ -30,5 +30,10 @@
     "css-modules-require-hook": "~4.0.6",
     "generic-names": "~1.0.2",
     "yoshi-utils": "^1.0.0"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/yoshi-runtime",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/yoshi-runtime"
   }
 }

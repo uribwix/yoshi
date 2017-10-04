@@ -36,5 +36,10 @@
   },
   "dependencies": {
     "angular": "^1.6.1"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/examples/client-angular1-ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/examples/client-angular1-ts"
   }
 }

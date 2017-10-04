@@ -1,7 +1,7 @@
 {
   "name": "client-react-lazy-load",
   "version": "1.0.0",
-  "homepage": "",
+  "homepage": "https://github.com/wix/yoshi/tree/master/examples/client-react-lazy-load",
   "author": {
     "name": "Roy Miloh",
     "email": "roymi@wix.com",
@@ -70,5 +70,9 @@
       "<rootDir>/node_modules/"
     ],
     "testEnvironment": "node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/examples/client-react-lazy-load"
   }
 }

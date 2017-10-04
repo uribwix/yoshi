@@ -28,5 +28,10 @@
     "wnpm-ci": "latest",
     "yeoman-assert": "^2.0.0",
     "yeoman-test": "^1.0.0"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/generators/generator-yoshi-web",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/generators/generator-yoshi-web"
   }
 }

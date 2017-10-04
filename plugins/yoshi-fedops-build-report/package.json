@@ -30,5 +30,10 @@
   "dependencies": {
     "glob": "~7.1.2",
     "graphite-tcp": "~1.0.4"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/plugins/yoshi-fedops-build-report",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/plugins/yoshi-fedops-build-report"
   }
 }

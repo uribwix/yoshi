@@ -33,5 +33,10 @@
   },
   "eslintConfig": {
     "extends": "wix"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/presets/yoshi-preset-all",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/presets/yoshi-preset-all"
   }
 }

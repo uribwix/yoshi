@@ -18,5 +18,10 @@
   },
   "devDependencies": {
     "wnpm-ci": "latest"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/test-phases",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/test-phases"
   }
 }

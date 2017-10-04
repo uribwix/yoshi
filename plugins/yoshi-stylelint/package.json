@@ -28,5 +28,10 @@
   },
   "eslintConfig": {
     "extends": "wix"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/plugins/yoshi-stylelint",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/plugins/yoshi-stylelint"
   }
 }

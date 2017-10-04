@@ -28,10 +28,15 @@
     "typescript": "~2.3.0",
     "wnpm-ci": "latest"
   },
-  "peerDependencies" : {
+  "peerDependencies": {
     "typescript": "^2.3.0"
   },
   "eslintConfig": {
     "extends": "wix"
+  },
+  "homepage": "https://github.com/wix/yoshi/tree/master/plugins/yoshi-tslint",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/yoshi/tree/master/plugins/yoshi-tslint"
   }
 }
