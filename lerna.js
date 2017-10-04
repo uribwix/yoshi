@@ -2,9 +2,8 @@ const {loadPackages, loadRootPackage, iter, exec, filters} = require('lerna-scri
   idea = require('lerna-script-tasks-idea'),
   npmfix = require('lerna-script-tasks-npmfix');
 
-/* Run tests for all modules */
-function test() {
-  return log => iter.forEach(loadPackages(), {log, build: 'test'})((lernaPackage, log) => {
+function test(log) {
+  return iter.forEach(loadPackages(), {log, build: 'test'})((lernaPackage, log) => {
     return Promise.resolve()
       .then(() => exec.script(lernaPackage, {log})('build'))
       .then(() => exec.script(lernaPackage, {log})('test'));
@@ -40,6 +39,6 @@ function clean(log) {
 module.exports = {
   clean,
   prepush,
-  test: test(),
+  test,
   idea: idea(),
 };
