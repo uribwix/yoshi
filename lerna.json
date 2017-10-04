@@ -1,0 +1,19 @@
+{
+  "lerna": "2.0.0",
+  "npmClient": "yarn",
+  "npmClientArgs": [
+    "--no-lockfile",
+    "--ignore-engines"
+  ],
+  "packages": [
+    "yoshi",
+    "yoshi-runtime",
+    "yoshi-utils",
+    "test-phases",
+    "examples/*",
+    "generators/generator-yoshi-*",
+    "plugins/*",
+    "presets/*"
+  ],
+  "version": "0.0.0"
+}
