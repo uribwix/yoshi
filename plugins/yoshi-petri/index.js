@@ -15,7 +15,9 @@ function runWatch() {
 module.exports = ({watch, statics, projectConfig}) => {
   const directory = 'petri-specs';
   const json = path.join(statics(), 'petri-experiments.json');
-  const petriSpecsConfig = projectConfig.petriSpecsConfig();
+  const petriSpecsConfig = typeof projectConfig.petriSpecsConfig === 'function' ?
+    projectConfig.petriSpecsConfig() :
+    {};
 
   function runBuild() {
     const options = Object.assign({directory, json}, petriSpecsConfig);

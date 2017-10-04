@@ -73,6 +73,13 @@ describe('Petri', () => {
       });
   });
 
+  it('should fallback to empty specs object if petriSpecsConfig is not a function', () => {
+    test.setup(petriSpecsTestkit.baseFsWith());
+
+    return task({petriSpecsConfig: null})
+      .then(() => expect(stdout).to.contain('converted 0 specs'));
+  });
+
   it.skip('should do nothing if there is no petri-specs installed', () => {
     // TODO: figure out how to simulate module doesn't exist in registry
   });
