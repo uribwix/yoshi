@@ -7,7 +7,7 @@ function test() {
   return log => iter.forEach(loadPackages(), {log, build: 'test'})((lernaPackage, log) => {
     return Promise.resolve()
       .then(() => exec.script(lernaPackage, {log})('build'))
-      .then(() => exec.script(lernaPackage, {log, silent: false})('test'));
+      .then(() => exec.script(lernaPackage, {log})('test'));
   });
 }
 
