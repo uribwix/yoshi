@@ -3,12 +3,10 @@ const {loadPackages, loadRootPackage, iter, exec, filters} = require('lerna-scri
   npmfix = require('lerna-script-tasks-npmfix');
 
 function test(log) {
-  console.log(process.env);
-  console.log(isTravis());
   // silence test output in travis or else it exceeds 4MB travis limit and job terminates
-  let silent = isTravis();
+  const silent = isTravis();
   // print . periodically in travis to generate input and for travis would not kill job
-  isTravis() && setInterval(() => process.stdout.write('.'), 1000 * 60 * 5).unref();
+  isTravis() && setInterval(() => console.log('.'), 1000 * 60 * 5).unref();
 
   return iter.forEach(loadPackages(), {log, build: 'test'})((lernaPackage, log) => {
     return Promise.resolve()
