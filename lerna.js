@@ -3,10 +3,15 @@ const {loadPackages, loadRootPackage, iter, exec, filters} = require('lerna-scri
   npmfix = require('lerna-script-tasks-npmfix');
 
 function test(log) {
+  // silence test output in travis or else it exceeds 4MB travis limit and job terminates
+  let silent = isTravis();
+  // print . periodically in travis to generate input and for travis would not kill job
+  isTravis() && setInterval(() => process.stdout.write('.'), 1000 * 60 * 5).unref();
+
   return iter.forEach(loadPackages(), {log, build: 'test'})((lernaPackage, log) => {
     return Promise.resolve()
       .then(() => exec.script(lernaPackage, {log})('build'))
-      .then(() => exec.script(lernaPackage, {log})('test'));
+      .then(() => exec.script(lernaPackage, {log, silent})('test'));
   });
 }
 
@@ -34,6 +39,10 @@ function clean(log) {
       return Promise.all(['rm -f *.log', 'rm -f yarn.lock', 'rm -rf target', 'rm -f package-lock.json'].map(execCmd));
     });
   });
+}
+
+function isTravis(log) {  
+  return process.env['CI'] !== 'undefined' && process.env['CI'] === 'true';
 }
 
 module.exports = {
