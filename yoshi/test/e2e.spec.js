@@ -18,14 +18,14 @@ describe('Aggregator: e2e', () => {
   describe('should run protractor with a cdn server', function () {
     this.timeout(60000);
 
-    it('should download chromedriver 2.28 and use it', () => {
+    it('should download chromedriver 2.29 and use it', () => {
       const res = test
         .setup({
           'protractor.conf.js': '',
           'package.json': fx.packageJson()
         })
         .execute('test', ['--protractor'], outsideTeamCity);
-      const chromedriver = path.resolve('node_modules', 'webdriver-manager', 'selenium', 'chromedriver_2.28.zip');
+      const chromedriver = path.resolve('node_modules', 'webdriver-manager', 'selenium', 'chromedriver_2.29.zip');
 
       expect(res.code).to.equal(1);
       expect(exists(chromedriver)).to.be.true;
