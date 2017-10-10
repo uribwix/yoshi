@@ -3,12 +3,14 @@ const {loadPackages, loadRootPackage, iter, exec, filters} = require('lerna-scri
   npmfix = require('lerna-script-tasks-npmfix');
 
 function test(log) {
-  // override mocha reporter for 'mocha-env-reporter'
-  process.env['mocha_reporter'] = 'min';
-  // silence test output in travis or else it exceeds 4MB travis limit and job terminates
-  // const silent = isTravis();
-  // print . periodically in travis to generate input and for travis would not kill job
-  // isTravis() && setInterval(() => console.log('.'), 1000 * 60 * 5).unref();
+  if (isTravis()) {
+    // print . periodically in travis to generate input and for travis would not kill job
+    setInterval(() => console.log('.'), 1000 * 60 * 5).unref();
+    // disable progress to not fill output
+    log.disableProgress();
+    // override mocha reporter for 'mocha-env-reporter'
+    process.env['mocha_reporter'] = 'min';
+  }
 
   return iter.forEach(loadPackages(), {log, build: 'test'})((lernaPackage, log) => {
     return Promise.resolve()
@@ -43,9 +45,9 @@ function clean(log) {
   });
 }
 
-// function isTravis(log) {
-//   return process.env['CI'] !== 'undefined' && process.env['CI'] === 'true';
-// }
+function isTravis(log) {
+  return process.env['CI'] !== 'undefined' && process.env['CI'] === 'true';
+}
 
 module.exports = {
   clean,
