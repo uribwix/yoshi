@@ -89,7 +89,8 @@
     "webpack-dev-middleware": "~1.11.0",
     "webpack-hot-middleware": "~2.18.2",
     "wix-tpa-style-loader": "~1.0.8",
-    "yoshi-runtime": "^1.0.7"
+    "yoshi-runtime": "~1.0.0",
+    "yoshi-utils": "~1.0.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -110,7 +111,7 @@
     "yoshi-clean": "latest",
     "yoshi-copy": "latest",
     "yoshi-eslint": "latest",
-    "yoshi-fedops-build-report": "^1.0.0",
+    "yoshi-fedops-build-report": "~1.0.0",
     "yoshi-maven-statics": "latest",
     "yoshi-petri": "latest",
     "yoshi-sass": "latest",

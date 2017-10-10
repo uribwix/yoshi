@@ -1,22 +1,33 @@
 'use strict';
 
+const path = require('path');
+const mkdirp = require('mkdirp');
 const {watchMode, logIfAny, inTeamCity} = require('./utils');
 const {log, logIf, logIfP} = require('./log');
 const {base, statics} = require('./globs');
 const projectConfig = require('../config/project');
 const {spawnSync} = require('child_process');
 const {tryRequire} = require('./utils');
-const path = require('path');
+const {usingYarn} = require('yoshi-utils');
 
 const watch = watchMode();
 
 function pluginInstall(modules) {
   return new Promise((resolve, reject) => {
-    const child = spawnSync('npm', ['install', '--prefix', 'node_modules/yoshi/plugins'].concat(modules), {shell: true});
+    let cp;
+    const yoshiDir = path.resolve(__dirname, '..');
+    const pluginsDir = path.join(yoshiDir, 'plugins');
 
-    child.status === 0 ?
+    if (usingYarn()) {
+      mkdirp(pluginsDir);
+      cp = spawnSync('yarn', ['add', ...modules, '--no-lockfile'], {shell: true, cwd: pluginsDir});
+    } else {
+      cp = spawnSync('npm', ['install', ...modules, '--prefix', pluginsDir], {shell: true});
+    }
+
+    cp.status === 0 ?
       resolve() :
-      reject(child.stderr.toString());
+      reject(cp.stderr.toString());
   });
 }
 

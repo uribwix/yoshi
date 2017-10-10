@@ -8,3 +8,7 @@ module.exports.isCI = () => !!(
 );
 
 module.exports.utilsTestkit = require('./utils-testkit');
+
+module.exports.usingYarn = () => (/\byarn\b/).test(process.env.npm_config_user_agent);
+
+module.exports.pkgManager = () => (process.env.npm_execpath || 'npm');
