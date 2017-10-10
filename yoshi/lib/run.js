@@ -22,7 +22,7 @@ function pluginInstall(modules) {
       mkdirp(pluginsDir);
       cp = spawnSync('yarn', ['add', ...modules, '--no-lockfile'], {shell: true, cwd: pluginsDir});
     } else {
-      cp = spawnSync('npm', ['install', ...modules, '--prefix', pluginsDir], {shell: true});
+      cp = spawnSync('npm', ['install', ...modules, '--prefix', pluginsDir, '--no-package-lock', '--no-save', '--silent'], {shell: true, stdio: ['inherit', 'pipe', 'inherit']});
     }
 
     cp.status === 0 ?
