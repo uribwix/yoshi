@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "test": "mocha './test/{,!(fixtures)/**/}/*.spec.js'",
     "posttest": "npm run lint",
-    "release": "wnpm-release --no-shrinkwrap && bundle-dependencies update && rm -rf node_modules && npm install --production && npm dedupe && npm prune"
+    "release": "wnpm-release --no-shrinkwrap"
   },
   "bin": {
     "yoshi": "./yoshi.js"
@@ -97,7 +97,6 @@
   },
   "devDependencies": {
     "babel-plugin-transform-es2015-block-scoping": "~6.26.0",
-    "bundle-dependencies": "^1.0.2",
     "chai": "~3.5.0",
     "eslint": "~3.19.0",
     "generic-names": "~1.0.2",
