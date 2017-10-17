@@ -83,9 +83,6 @@ module.exports.watchMode = value => {
   return !!process.env.WIX_NODE_BUILD_WATCH_MODE;
 };
 
-module.exports.migrateToScopedPackages = () =>
-  process.env.MIGRATE_TO_SCOPED_PACKAGES === 'true';
-
 module.exports.inTeamCity = () =>
   process.env.BUILD_NUMBER || process.env.TEAMCITY_VERSION;
 
