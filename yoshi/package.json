@@ -110,6 +110,7 @@
     "typescript": "~2.3.0",
     "wnpm-ci": "latest",
     "yoshi-babel": "latest",
+    "yoshi-check-deps": "~1.0.0",
     "yoshi-clean": "latest",
     "yoshi-copy": "latest",
     "yoshi-eslint": "latest",
