@@ -111,7 +111,7 @@ describe('Aggregator: Start', () => {
 
         return checkServerIsServing({port: 3200, file: 'app.bundle.js'})
           .then(content =>
-            expect(content).to.contain(`__webpack_require__.p = "//localhost:3200/";`));
+            expect(content).to.contain(`__webpack_require__.p = "http://localhost:3200/";`));
       });
 
       it('should be able to set public path via servers.cdn.url', () => {
@@ -139,7 +139,7 @@ describe('Aggregator: Start', () => {
 
         return checkServerIsServing({port: 3200, file: 'app.bundle.min.js'})
           .then(content =>
-            expect(content).to.contain(`__webpack_require__.p = "//localhost:3200/";`));
+            expect(content).to.contain(`__webpack_require__.p = "http://localhost:3200/";`));
       });
 
       it('should serve files without "min" suffix when requested with a "min" suffix in ssl', () => {
@@ -156,7 +156,7 @@ describe('Aggregator: Start', () => {
 
         return checkServerIsServing({port: 3200, file: 'app.bundle.min.js', protocol: 'https', options: {agent}})
           .then(content =>
-            expect(content).to.contain(`__webpack_require__.p = "//localhost:3200/";`));
+            expect(content).to.contain(`__webpack_require__.p = "https://localhost:3200/";`));
       });
 
       it('should run cdn server with default dir', () => {
