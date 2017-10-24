@@ -61,16 +61,21 @@ describe('Petri', () => {
       });
   });
 
-  it('should warn when converting deprecated json files', () => {
+  it('should reject Promise when converting deprecated json files', () => {
+    const errorMessage = `Error: yoshi-petri detected 1 deprecated specs that got converted. More info: https://github.com/wix-private/petri-specs/docs/CONVERT_SPECS.md`;
+
     test.setup(petriSpecsTestkit.baseFsWith({
       'petri-specs/specs.infra.Dummy.json': JSON.stringify(petriSpecsTestkit.singleScopeSpec('specs.infra.Dummy'))
     }));
 
-    return task()
-      .then(() => {
-        expect(stdout).to.contain('Warning: yoshi-petri converted 1 deprecated specs to the new format. Please verify, commit and push those files before 01/11/2017. More info: https://github.com/wix-private/petri-specs/docs/CONVERT_SPECS.md');
+    return new Promise((resolve, reject) =>
+      task().then(reject, err => {
+        expect(stdout).to.contain(errorMessage);
+        expect(err).to.contain(errorMessage);
         expect(test.list('statics', '-R')).to.contain('petri-experiments.json');
-      });
+        resolve();
+      })
+    );
   });
 
   it.skip('should do nothing if there is no petri-specs installed', () => {
