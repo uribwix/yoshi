@@ -77,5 +77,15 @@ describe('yoshi-deps', () => {
         return acc;
       }, {})
     });
+
+    npmServer.get('/yoshi').reply(200, {
+      _id: 'yoshi',
+      name: 'yoshi',
+      'dist-tags': {latest: versions.slice().pop()},
+      versions: versions.reduce((acc, ver) => {
+        acc[ver] = {};
+        return acc;
+      }, {})
+    });
   }
 });

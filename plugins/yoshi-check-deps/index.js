@@ -7,7 +7,7 @@ function deps() {
   return depkeeper()
     .rule('yoshi', {major: 1})
     .rule('yoshi', {major: 0, minor: 0, patch: 0})
-    .check()
+    .checkRules()
     .then(([outdated1, outdated2]) => {
       if (outdated1.length) {
         return fail(outdated1);

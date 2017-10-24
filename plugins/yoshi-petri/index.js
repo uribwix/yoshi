@@ -23,7 +23,9 @@ module.exports = ({watch, statics, projectConfig}) => {
     petriSpecs.build(options);
 
     if (convertedFilesCount > 0) {
-      console.warn(chalk.yellow(`Warning: yoshi-petri converted ${convertedFilesCount} deprecated specs to the new format. Please verify, commit and push those files before 01/11/2017. More info: https://github.com/wix-private/petri-specs/docs/CONVERT_SPECS.md`));
+      const errorMessage = `Error: yoshi-petri detected ${convertedFilesCount} deprecated specs that got converted. More info: https://github.com/wix-private/petri-specs/docs/CONVERT_SPECS.md`;
+      console.error(chalk.red(errorMessage));
+      return Promise.reject(errorMessage);
     }
 
     return Promise.resolve();
