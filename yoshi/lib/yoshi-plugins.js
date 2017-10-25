@@ -23,7 +23,7 @@ function tests(options) {
 
 module.exports = options => ({
   build: [
-    ['yoshi-clean', 'yoshi-update-node-version', './tasks/migrate-to-scoped-packages'],
+    ['yoshi-clean', 'yoshi-update-node-version', './tasks/migrate-to-scoped-packages', 'yoshi-check-deps'],
     ['yoshi-sass', './tasks/less', 'yoshi-petri', 'yoshi-maven-statics', 'yoshi-copy', transpiler(), './tasks/bundle'],
     ['yoshi-fedops-build-report']
   ],

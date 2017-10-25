@@ -1224,6 +1224,15 @@ describe('Aggregator: Build', () => {
     });
   });
 
+  describe('yoshi-check-deps', () => {
+    it('should run yoshi-check-deps and do nothing because yoshi isn\'t installed', () => {
+      const resp = test
+        .setup({'package.json': fx.packageJson()})
+        .execute('build');
+      expect(resp.stdout).to.contain('checkDeps');
+    });
+  });
+
 
   describe('symlinks', () => {
     it('should not resolve symlinks to their symlinked location', () => {

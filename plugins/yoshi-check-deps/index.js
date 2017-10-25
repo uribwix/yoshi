@@ -3,7 +3,7 @@ const depkeeper = require('depkeeper');
 
 // const registryUrl = `http://repo.dev.wixpress.com/artifactory/api/npm/npm-repos/`;
 
-function deps() {
+function checkDeps() {
   return depkeeper()
     .rule('yoshi', {major: 1})
     .rule('yoshi', {major: 0, minor: 0, patch: 0})
@@ -32,4 +32,4 @@ function warn(deps) {
   return Promise.resolve(message);
 }
 
-module.exports = ({log}) => log(deps);
+module.exports = ({log}) => log(checkDeps);
