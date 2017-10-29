@@ -5,6 +5,20 @@ const jestCli = require('jest-cli');
 const jestProjectConfig = require('../../config/project').jestConfig();
 const {inTeamCity} = require('../utils');
 
+const argsFromConfig = (watch, config) => {
+  let argv = [];
+
+  if (watch) {
+    argv.push('--watch');
+  }
+
+  argv.push(
+    '--config',
+    JSON.stringify(config)
+  );
+  return argv;
+};
+
 module.exports = ({log, watch}) => {
   function jest() {
     if (inTeamCity()) {
@@ -18,8 +32,10 @@ module.exports = ({log, watch}) => {
       }
     });
 
+    const argv = argsFromConfig(watch, config);
+
     return new Promise((resolve, reject) => {
-      jestCli.runCLI({watch, config}, [process.cwd()], result => {
+      jestCli.run(argv, process.cwd(), result => {
         result.success ? resolve() : reject('jest failed');
       });
     });
